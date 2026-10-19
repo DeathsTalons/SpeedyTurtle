@@ -4,6 +4,8 @@ create table stripe_events (
   type text not null,
   received_at timestamptz not null default now()
 );
+-- Only the server (service role) touches this table; no policies means the public key can't.
+alter table stripe_events enable row level security;
 
 alter table orders add column dispute_status text;   -- null, 'open', 'won', 'lost', ...
 
