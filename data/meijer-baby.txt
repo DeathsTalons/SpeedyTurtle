@@ -1,0 +1,63 @@
+# Baby & toddler. One search per line; lines starting with # are skipped.
+
+# Diapers & wipes
+pampers swaddlers diapers
+pampers baby dry diapers
+huggies little snugglers diapers
+huggies little movers diapers
+luvs diapers
+newborn diapers
+size 4 diapers
+pull-ups training pants
+overnight diapers
+pampers sensitive wipes
+huggies natural care wipes
+diaper rash cream
+desitin
+diaper pail refills
+swim diapers
+
+# Formula
+similac 360 total care
+similac pro-advance
+enfamil neuropro
+enfamil gentlease
+enfamil a.r.
+gerber good start
+store brand infant formula
+ready to feed formula bottles
+toddler formula
+pedialyte
+
+# Baby food
+gerber baby food purees
+gerber puffs
+gerber yogurt melts
+baby food pouches
+baby cereal oatmeal
+toddler snacks
+gerber graduates
+happy baby organic pouches
+plum organics pouches
+teething wafers
+
+# Feeding
+baby bottles
+bottle nipples
+sippy cups
+pacifiers
+bibs
+breast milk storage bags
+nursing pads
+
+# Bath & care
+johnson's baby shampoo
+baby lotion
+baby wash
+aquaphor baby
+baby powder
+infant tylenol
+infant motrin
+baby thermometer
+saline nasal drops baby
+gripe water

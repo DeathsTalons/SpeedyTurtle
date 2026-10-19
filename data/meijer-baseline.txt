@@ -1,0 +1,195 @@
+# Starter list for Meijer aisle lookups. One search per line; lines starting with # are skipped.
+# The script takes the top matches for each line (default 2) and looks up their aisle at every Meijer.
+
+# Produce
+bananas
+apples gala
+honeycrisp apples
+strawberries
+blueberries
+grapes red seedless
+lemons
+limes
+avocados
+oranges navel
+clementines
+watermelon
+tomatoes
+roma tomatoes
+yellow onions
+red onions
+garlic
+potatoes russet
+sweet potatoes
+carrots baby
+celery
+broccoli
+cauliflower
+cucumber
+green bell pepper
+jalapeno
+lettuce romaine
+iceberg lettuce
+spinach bagged
+salad mix bagged
+mushrooms white
+green onions
+cilantro
+corn on the cob
+zucchini
+
+# Dairy & eggs
+whole milk gallon
+2% milk gallon
+skim milk
+almond milk
+oat milk
+half and half
+heavy whipping cream
+coffee creamer
+large eggs dozen
+butter salted
+margarine
+shredded cheddar cheese
+sliced american cheese
+mozzarella string cheese
+cream cheese
+sour cream
+cottage cheese
+greek yogurt
+yogurt cups
+orange juice
+
+# Meat & seafood
+chicken breast boneless
+chicken thighs
+ground beef
+ground turkey
+bacon
+pork chops
+hot dogs
+breakfast sausage
+deli turkey sliced
+deli ham sliced
+salmon fillet
+frozen shrimp
+rotisserie chicken
+
+# Bakery & bread
+white sandwich bread
+wheat bread
+hamburger buns
+hot dog buns
+bagels
+english muffins
+flour tortillas
+donuts
+
+# Pantry
+spaghetti pasta
+macaroni and cheese
+marinara pasta sauce
+white rice
+peanut butter
+grape jelly
+canned black beans
+canned diced tomatoes
+chicken noodle soup
+chicken broth
+canned tuna
+all purpose flour
+granulated sugar
+brown sugar
+vegetable oil
+olive oil
+salt
+black pepper
+ketchup
+mustard
+mayonnaise
+ranch dressing
+barbecue sauce
+syrup pancake
+pancake mix
+honey
+
+# Breakfast & coffee
+cheerios
+frosted flakes
+oatmeal quaker
+granola bars
+ground coffee
+k-cups coffee pods
+tea bags
+
+# Snacks & candy
+potato chips
+tortilla chips
+salsa
+pretzels
+goldfish crackers
+saltine crackers
+popcorn microwave
+oreo cookies
+mixed nuts
+fruit snacks
+chocolate candy bar
+
+# Drinks
+bottled water case
+sparkling water
+coca-cola 12 pack
+pepsi 12 pack
+gatorade
+apple juice
+
+# Frozen
+frozen pizza
+ice cream
+frozen vegetables mixed
+frozen french fries
+frozen chicken nuggets
+frozen waffles
+frozen burritos
+ice bag
+
+# Baby
+diapers
+baby wipes
+baby formula
+
+# Pet
+dry dog food
+dry cat food
+cat litter
+dog treats
+
+# Household & paper
+paper towels
+toilet paper
+facial tissue
+trash bags kitchen
+aluminum foil
+plastic wrap
+zip storage bags
+dish soap
+dishwasher detergent pods
+laundry detergent
+fabric softener
+bleach
+all purpose cleaner spray
+sponges
+
+# Health & personal care
+toothpaste
+toothbrush
+shampoo
+conditioner
+body wash
+bar soap
+deodorant
+razors
+ibuprofen
+acetaminophen
+band aids
+cough drops

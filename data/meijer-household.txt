@@ -1,0 +1,78 @@
+# Household, cleaning & paper. One search per line; lines starting with # are skipped.
+
+# Paper & disposables
+bounty paper towels
+charmin toilet paper
+kleenex tissues
+napkins
+paper plates
+plastic cups
+plastic utensils
+foam bowls
+coffee filters
+parchment paper
+wax paper
+gallon freezer bags
+sandwich bags
+food storage containers
+heavy duty trash bags
+small trash bags
+compactor trash bags
+
+# Laundry
+tide liquid detergent
+tide pods
+gain laundry detergent
+all free clear detergent
+downy fabric softener
+dryer sheets
+oxiclean stain remover
+shout stain remover
+color safe bleach
+laundry scent beads
+
+# Kitchen & dish
+cascade platinum pods
+dawn dish soap
+dish scrub brush
+rinse aid
+dishwasher cleaner
+paper towel holder refill
+kitchen trash can
+
+# Cleaning
+clorox disinfecting wipes
+lysol disinfectant spray
+windex glass cleaner
+mr clean magic eraser
+swiffer wet jet pads
+swiffer dry cloths
+toilet bowl cleaner
+scrubbing bubbles bathroom cleaner
+soft scrub
+pine-sol
+bar keepers friend
+furniture polish
+carpet cleaner spray
+mop
+broom and dustpan
+rubber gloves
+air freshener spray
+glade plug ins
+febreze fabric refresher
+candles
+
+# Batteries, bulbs & misc
+aa batteries
+aaa batteries
+9 volt batteries
+led light bulbs
+extension cord
+duct tape
+super glue
+matches
+lighter
+charcoal
+lighter fluid
+propane cylinder
+ice melt

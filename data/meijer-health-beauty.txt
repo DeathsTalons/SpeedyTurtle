@@ -1,0 +1,112 @@
+# Health, medicine & beauty. One search per line; lines starting with # are skipped.
+
+# Pain, cold & allergy
+advil
+tylenol extra strength
+aleve
+aspirin low dose
+excedrin migraine
+dayquil
+nyquil
+mucinex
+theraflu
+cold and flu relief
+zyrtec
+claritin
+benadryl
+flonase
+allergy eye drops
+cough syrup
+throat lozenges
+vicks vaporub
+saline nasal spray
+thermometer
+
+# Stomach & digestive
+tums
+pepto bismol
+imodium
+miralax
+gas x
+pepcid
+prilosec otc
+stool softener
+fiber supplement
+
+# First aid
+neosporin
+hydrogen peroxide
+rubbing alcohol
+gauze pads
+medical tape
+ace bandage
+hydrocortisone cream
+calamine lotion
+ice pack
+heating pad
+first aid kit
+
+# Vitamins & sleep
+multivitamin
+vitamin d
+vitamin c
+melatonin
+zzzquil
+electrolyte powder
+protein powder
+
+# Oral care
+crest toothpaste
+colgate toothpaste
+electric toothbrush heads
+dental floss
+listerine mouthwash
+denture cleaner
+whitening strips
+
+# Hair care
+head and shoulders shampoo
+pantene shampoo
+dry shampoo
+hair spray
+hair gel
+hair ties
+hair brush
+
+# Skin & body
+dove body wash
+irish spring soap
+hand soap refill
+hand sanitizer
+lotion body
+aveeno lotion
+cetaphil cleanser
+face wash
+sunscreen
+lip balm
+chapstick
+vaseline
+
+# Shaving & deodorant
+gillette razors
+disposable razors
+shaving cream
+degree deodorant
+secret deodorant
+old spice deodorant
+
+# Feminine care
+tampons
+pads always
+panty liners
+pregnancy test
+
+# Beauty & misc
+cotton balls
+cotton swabs q-tips
+makeup remover wipes
+nail polish remover
+nail clippers
+contact lens solution
+eye drops
+reading glasses

@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
+/* Speedy Turtle palette — shell green + shell amber on shopping-list paper */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-bricolage: "Bricolage Grotesque Variable";
+  --font-atkinson: "Atkinson Hyperlegible";
+  --paper: #eef2ea;      /* page background */
+  --card: #fbfcf8;       /* raised surfaces */
+  --ink: #17261e;        /* text */
+  --muted: #56675c;      /* secondary text */
+  --line: #cdd8c8;       /* borders */
+  --shell: #1f5a40;      /* primary green */
+  --shell-dark: #163f2d;
+  --amber: #d99a2b;      /* turtle-shell accent */
+  --amber-soft: #f6e3bd;
+  --danger: #a33a2a;
+  --kroger: #1f4fa3;     /* store tags */
+  --meijer: #b0322b;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-shell: var(--shell);
+  --color-shell-dark: var(--shell-dark);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-danger: var(--danger);
+  --color-kroger: var(--kroger);
+  --color-meijer: var(--meijer);
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-atkinson);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-atkinson), system-ui, sans-serif;
+  line-height: 1.5;
 }
+
+h1, h2, h3 { font-family: var(--font-bricolage), system-ui, sans-serif; letter-spacing: -0.01em; line-height: 1.15; }
+
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Small reusable pieces */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: 999px; padding: .7rem 1.25rem; font-weight: 700; min-height: 44px; }
+.btn-primary { background: var(--shell); color: #fff; }
+.btn-primary:hover { background: var(--shell-dark); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-ghost { border: 1.5px solid var(--line); background: var(--card); }
+.btn-ghost:hover { border-color: var(--shell); }
+.field { display: block; width: 100%; border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: .7rem .9rem; min-height: 44px; }
+.field:focus { border-color: var(--shell); outline: none; }
+.label { display: block; font-weight: 700; margin-bottom: .3rem; }
+.tag-kroger { color: var(--kroger); }
+.tag-meijer { color: var(--meijer); }
+
+/* Admin screens use more width than the customer pages. */
+.admin-wide { width: min(76rem, calc(100vw - 2rem)); position: relative; left: 50%; transform: translateX(-50%); }

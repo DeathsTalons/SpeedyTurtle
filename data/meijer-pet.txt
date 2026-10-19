@@ -1,0 +1,67 @@
+# Pet supplies. One search per line; lines starting with # are skipped.
+
+# Dog food & treats
+purina dog chow
+pedigree dry dog food
+blue buffalo dog food
+iams dog food
+puppy food dry
+small breed dog food
+canned dog food
+pedigree wet dog food pouches
+milk-bone dog biscuits
+beggin strips
+greenies dental treats
+rawhide chews
+dog bully sticks
+pill pockets dog
+
+# Cat food & treats
+purina cat chow
+meow mix
+friskies wet cat food
+fancy feast
+iams cat food
+blue buffalo cat food
+kitten food dry
+temptations cat treats
+churu cat treats
+catnip
+
+# Litter & cleanup
+clumping cat litter
+tidy cats litter
+fresh step litter
+cat litter liners
+litter box
+puppy pee pads
+dog waste bags
+pet stain and odor remover
+lint roller pet hair
+
+# Toys & accessories
+dog chew toy
+tennis balls dog
+rope toy dog
+cat toy mice
+cat scratcher
+dog leash
+dog collar
+pet food bowl
+pet water fountain
+
+# Health & grooming
+flea and tick treatment dog
+flea collar cat
+dog shampoo
+pet wipes
+dog toothpaste
+
+# Small animals, birds, fish
+hamster food
+guinea pig food
+timothy hay
+small animal bedding
+wild bird seed
+tropical fish flakes
+aquarium water conditioner
