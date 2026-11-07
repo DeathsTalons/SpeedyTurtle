@@ -32,7 +32,7 @@ export function OrderSummary({ items, tiers, bufferPct, secondStoreFeeCents, add
               : `${q.tier.label} fee.`}
         </p>
       )}
-      {hasRequests && <p className="text-sm text-muted">Requested items are estimated at $5 each until Cody finds them.</p>}
+      {hasRequests && <p className="text-sm text-muted">Requested items are estimated at $5 each until I find them.</p>}
     </div>
   );
 }

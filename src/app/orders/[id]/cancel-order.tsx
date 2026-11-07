@@ -19,7 +19,7 @@ export function CancelOrder({ orderId, held }: { orderId: string; held: boolean 
   return (
     <div className="space-y-1">
       <button className="btn btn-ghost !text-danger" onClick={cancel} disabled={pending}>{pending ? "Canceling…" : "Cancel order"}</button>
-      <p className="text-sm text-muted">Free to cancel until Cody starts shopping.</p>
+      <p className="text-sm text-muted">Free to cancel until I start shopping.</p>
       {error && <p role="alert" className="text-danger font-bold">{error}</p>}
     </div>
   );

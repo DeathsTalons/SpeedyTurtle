@@ -7,7 +7,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <header className="space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-shell-dark">Contact Cody</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-shell-dark">Get in touch</h1>
         <p className="text-lg">
           {BUSINESS.name} is just me, Cody. I shop every order myself, so you&apos;ll always reach the person handling your groceries.
         </p>

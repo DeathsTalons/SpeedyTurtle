@@ -102,7 +102,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   let slot: { date: string; slotTemplateId: number | null };
   if (input.asap) {
     const a = await getAvailability();
-    if (!a.open) return { error: "Cody just stopped taking same-day orders. Pick a delivery window instead." };
+    if (!a.open) return { error: "I just stopped taking same-day orders. Pick a delivery window instead." };
     slot = { date: localDate(new Date()), slotTemplateId: null };
   } else {
     const slots = await getAvailableSlots();
@@ -115,7 +115,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   const weekStart = addDays(slot.date, -weekdayOf(slot.date));
   const { count: weekCount } = await admin.from("orders").select("id", { count: "exact", head: true })
     .neq("status", "canceled").gte("delivery_date", weekStart).lte("delivery_date", addDays(weekStart, 6));
-  if ((weekCount ?? 0) >= settings.maxOrdersPerWeek) return { error: "Cody is fully booked that week. Pick a day in another week." };
+  if ((weekCount ?? 0) >= settings.maxOrdersPerWeek) return { error: "I'm fully booked that week. Pick a day in another week." };
 
   // ── Stores: main store nearest this address, add-on store nearest the main store ──
   const home = address.latitude != null ? { latitude: address.latitude, longitude: address.longitude } : null;

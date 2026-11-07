@@ -10,10 +10,11 @@ export default async function Home() {
     <div className="pt-6 space-y-8">
       <AvailableBanner a={await getAvailability()} />
       <section className="space-y-4">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-shell-dark max-w-xl">Kroger or Meijer, shopped by Cody.</h1>
+        <p className="font-bold text-lg text-[var(--cardinal)]">Hi, I&apos;m Cody.</p>
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-shell-dark max-w-xl">I&apos;ll shop your Kroger or Meijer groceries for you.</h1>
         <p className="text-lg max-w-lg">
-          Pick your store and fill your cart. Cody shops it himself, texts you before swapping anything,
-          and drops it at your door in Brownsburg, Avon and Greencastle.
+          Pick your store and fill your cart. I shop every order myself, text you before swapping anything,
+          and drop it at your door in Brownsburg, Avon and Greencastle.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/login" className="btn btn-primary">Create an account or sign in</Link>
@@ -23,7 +24,7 @@ export default async function Home() {
       <section aria-labelledby="how" className="bg-card border border-line rounded-3xl p-6">
         <h2 id="how" className="text-2xl font-extrabold mb-4">How it works</h2>
         <ol className="space-y-3 list-decimal pl-5 marker:font-bold marker:text-amber">
-          <li>Choose Kroger or Meijer and fill your cart. Can&apos;t find something? Type it in and Cody will grab it. Need a few things from the other store? Add them for a small extra fee.</li>
+          <li>Choose Kroger or Meijer and fill your cart. Can&apos;t find something? Type it in and I&apos;ll grab it. Need a few things from the other store? Add them for a small extra fee.</li>
           <li>Pick a morning or afternoon window.</li>
           <li>Pay the store&apos;s receipt price plus a flat fee based on how many different items you order, not how many of each. <Link href="/pricing" className="underline font-bold">See pricing</Link>.</li>
         </ol>

@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "Redbird Grocery",
-  description: "Kroger and Meijer groceries, shopped and delivered by Cody.",
+  description: "Local Kroger and Meijer grocery delivery in Brownsburg, Avon and Greencastle. I shop and deliver every order myself.",
   appleWebApp: { capable: true, title: "Redbird", statusBarStyle: "default" },
 };
 

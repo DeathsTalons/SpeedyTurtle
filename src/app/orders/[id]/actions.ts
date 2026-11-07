@@ -36,7 +36,7 @@ export async function cancelMyOrder(orderId: string): Promise<{ ok?: true; error
   if (!user) return { error: "Sign in again." };
   const { data: o } = await db.from("orders").select("id, status, customer_id").eq("id", String(orderId)).maybeSingle();
   if (!o || o.customer_id !== user.id) return { error: "Order not found." };
-  if (o.status !== "placed") return { error: "Cody has already started shopping this order, so it can't be canceled. Text him if something's wrong." };
+  if (o.status !== "placed") return { error: "I've already started shopping this order, so it can't be canceled. Text me if something's wrong." };
 
   // Customers can't write orders directly (database rules), so the server does it after the checks above.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,7 +44,7 @@ export async function cancelMyOrder(orderId: string): Promise<{ ok?: true; error
   const { data: changed } = await admin.from("orders")
     .update({ status: "canceled", updated_at: new Date().toISOString() })
     .eq("id", o.id).eq("status", "placed").select("id");
-  if (!changed?.length) return { error: "Cody just started shopping this order, so it can't be canceled. Text him if something's wrong." };
+  if (!changed?.length) return { error: "I just started shopping this order, so it can't be canceled. Text me if something's wrong." };
   await releaseHold(o.id);
   revalidatePath(`/orders/${o.id}`);
   revalidatePath("/orders");

@@ -76,7 +76,7 @@ export const CUSTOMER_COLORS = ["#1f5a40", "#b0322b", "#1f4fa3", "#8a5a00", "#6b
 
 export const SUB_CHOICES = [
   { id: "approved", label: "Approved substitutions", hint: "List what's OK in the notes" },
-  { id: "codys_pick", label: "Cody's pick", hint: "Nearest similar item" },
+  { id: "codys_pick", label: "Let me pick", hint: "I'll grab the nearest similar item" },
   { id: "store_brand", label: "Store brand is OK", hint: "Kroger or Meijer brand" },
   { id: "refund", label: "Refund", hint: "Skip it if it's out" },
   { id: "other", label: "Other", hint: "Explain in the notes" },

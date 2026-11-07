@@ -142,7 +142,7 @@ function StoreSearch({ storeNames, addOnNames, hasAddress, secondStoreFeeCents, 
         {active && status === "loading" && "Searching…"}
         {active && status === "error" && <span className="text-danger font-bold">{error}</span>}
         {active && status === "done" && chain === "meijer" && results.length > 0 && "Meijer prices are estimates and vary a little by store. You're charged the receipt price."}
-        {active && status === "done" && results.length === 0 && `Nothing matched “${q.trim()}” at ${CHAIN_NAME[chain]}. Add it as a request below and Cody will find it.`}
+        {active && status === "done" && results.length === 0 && `Nothing matched “${q.trim()}” at ${CHAIN_NAME[chain]}. Add it as a request below and I&apos;ll find it.`}
       </div>
 
       <ul className={`divide-y divide-line bg-card border border-line rounded-3xl overflow-hidden ${active ? "" : "hidden"}`}>
@@ -159,7 +159,7 @@ function StoreSearch({ storeNames, addOnNames, hasAddress, secondStoreFeeCents, 
             placeholder={`Anything from ${CHAIN_NAME[chain]}: “bakery sourdough, sliced”`} />
           <button className="btn btn-primary shrink-0">Add</button>
         </div>
-        <p className="text-sm text-muted">Cody picks it up at shelf price. It counts as one item.</p>
+        <p className="text-sm text-muted">I&apos;ll pick it up at shelf price. It counts as one item.</p>
       </form>
 
       {!canAddOther[primary] && (

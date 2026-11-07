@@ -49,7 +49,7 @@ export async function addAddress(_: FormState, form: FormData): Promise<FormStat
   });
   if (error) return { error: error.message };
   revalidatePath("/account");
-  return { ok: point ? "Address saved." : "Address saved. Cody will confirm the nearest store for it." };
+  return { ok: point ? "Address saved." : "Address saved. I'll confirm the nearest store for it." };
 }
 
 export async function makeDefault(id: string) {

@@ -12,7 +12,7 @@ export function PricingDetails({ tiers, secondStoreFeeCents, bufferPct }: { tier
     <div className="space-y-6">
       <section className="bg-card border border-line rounded-3xl p-5 space-y-2">
         <h2 className="text-xl font-extrabold">Groceries at receipt price</h2>
-        <p>You pay exactly what&apos;s on the Kroger or Meijer receipt. Cody doesn&apos;t mark up a single item.</p>
+        <p>You pay exactly what&apos;s on the Kroger or Meijer receipt. I don&apos;t mark up a single item.</p>
       </section>
 
       <section className="bg-card border border-line rounded-3xl p-5 space-y-3" aria-labelledby="fee-h">
@@ -44,7 +44,7 @@ export function PricingDetails({ tiers, secondStoreFeeCents, bufferPct }: { tier
         <h2 className="text-xl font-extrabold">How your card is charged</h2>
         <p>
           When you order, your card is <b>held</b> (not charged) for the estimate plus about {bufferPct}%, to cover weighed produce
-          and price changes. After Cody shops, you&apos;re charged the real receipt total plus the fees above, and the rest of the hold is released.
+          and price changes. After I shop, you&apos;re charged the real receipt total plus the fees above, and the rest of the hold is released.
         </p>
       </section>
 

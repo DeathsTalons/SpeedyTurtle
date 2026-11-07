@@ -4,7 +4,7 @@ export function TipNote({ className = "" }: { className?: string }) {
   return (
     <p className={`text-sm text-muted ${className}`}>
       Tips are never required. There&apos;s no app company in the middle taking a cut of your order.
-      They&apos;re still appreciated, and every cent goes to Cody.
+      They&apos;re still appreciated, and every cent goes straight to me.
     </p>
   );
 }

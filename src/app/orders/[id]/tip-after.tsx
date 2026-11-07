@@ -19,7 +19,7 @@ export function TipAfter({ orderId }: { orderId: string }) {
     return (
       <section className="bg-shell text-white rounded-3xl p-5" role="status">
         <p className="font-display text-2xl font-extrabold">Thank you!</p>
-        <p>Your {money(done)} tip went straight to Cody.</p>
+        <p>Your {money(done)} tip came straight to me. I really appreciate it.</p>
       </section>
     );
   }

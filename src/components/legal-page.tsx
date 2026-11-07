@@ -9,7 +9,7 @@ export function LegalPage({ title, children }: { title: string; children: React.
       <p className="text-muted">Last updated {BUSINESS.policiesUpdated}</p>
       {children}
       <p className="mt-10 bg-card border border-line rounded-2xl p-4">
-        Questions? Text or call Cody at <a href={`tel:${BUSINESS.phoneHref}`}>{BUSINESS.phone}</a> or email{" "}
+        Questions? Text or call me at <a href={`tel:${BUSINESS.phoneHref}`}>{BUSINESS.phone}</a> or email{" "}
         <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>. More on the <Link href="/contact">contact page</Link>.
       </p>
     </article>

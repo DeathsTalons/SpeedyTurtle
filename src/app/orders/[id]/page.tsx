@@ -41,7 +41,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
       {placed && (
         <div role="status" className="bg-shell text-white rounded-3xl p-5">
           <p className="font-display text-2xl font-extrabold">Order placed</p>
-          <p>Cody will shop it {formatDate(o.delivery_date, { weekday: "long" })}. You&apos;ll get a text if anything needs your OK.</p>
+          <p>I&apos;ll shop it {formatDate(o.delivery_date, { weekday: "long" })}. I&apos;ll text you if anything needs your OK.</p>
         </div>
       )}
 
@@ -94,7 +94,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
           {o.payment_status === "captured" ? `Charged ${money((o.captured_cents ?? 0) - (o.refunded_cents ?? 0))} to your card.`
             : o.payment_status === "authorized" ? `Hold of ${money(o.authorized_amount_cents)} on your card. You're charged the receipt total after shopping, and the rest is released.`
             : o.payment_status === "card_saved" ? `Card saved. A hold of about ${money(o.authorized_amount_cents)} is placed on shopping day.`
-            : o.payment_status === "failed" ? "Your card couldn't be held. Cody will text you."
+            : o.payment_status === "failed" ? "Your card couldn't be held. I'll text you."
             : o.final_total_cents == null ? `Estimated hold: ${money(o.authorized_amount_cents)}. Final charge is the receipt total.` : null}
         </p>
         {o.later_tip_cents > 0 && (

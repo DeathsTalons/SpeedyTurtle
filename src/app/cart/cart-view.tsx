@@ -82,7 +82,7 @@ export function CartView({ tiers, bufferPct, secondStoreFeeCents, canAddOther, p
                       )}
                       <label className="sr-only" htmlFor={`note-${i.key}`}>Notes for {i.name}</label>
                       <input id={`note-${i.key}`} className="field !min-h-0 !py-2 text-sm"
-                        placeholder={(i.subChoice ?? "codys_pick") === "approved" ? "Anything else that's OK? “any 2% gallon”" : (i.subChoice === "other" ? "What should Cody do if it's out?" : "Notes for Cody (optional)")}
+                        placeholder={(i.subChoice ?? "codys_pick") === "approved" ? "Anything else that's OK? “any 2% gallon”" : (i.subChoice === "other" ? "What should I do if it's out?" : "Anything I should know? (optional)")}
                         value={i.note ?? ""} onChange={(e) => cart.setNote(i.key, e.target.value)} />
                     </li>
                   ))}

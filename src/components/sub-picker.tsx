@@ -40,7 +40,7 @@ export function SubPicker({ itemName, chain, primary, initial, onSave, onClose }
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-3" role="dialog" aria-modal="true" aria-label="Pick OK substitutes" onClick={onClose}>
       <div className="bg-card rounded-3xl p-5 w-full max-w-lg max-h-[90vh] flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-extrabold">OK substitutes for {itemName}</h2>
-        <p className="text-sm text-muted">Pick up to {MAX_APPROVED_SUBS}. If yours is out, Cody grabs the first one he finds.</p>
+        <p className="text-sm text-muted">Pick up to {MAX_APPROVED_SUBS}. If yours is out, I'll grab the first one I find.</p>
         {picked.length > 0 && (
           <ol className="flex flex-wrap gap-2">
             {picked.map((p, i) => (

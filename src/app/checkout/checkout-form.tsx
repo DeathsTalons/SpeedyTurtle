@@ -70,7 +70,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
           <label className={`flex gap-3 items-center cursor-pointer rounded-2xl border-2 p-3 ${slotKey === "asap" ? "border-shell bg-shell text-white" : "border-shell/50 bg-card"}`}>
             <input type="radio" name="slot" value="asap" checked={slotKey === "asap"} onChange={() => setSlotKey("asap")} className="sr-only" />
             <span className="w-3 h-3 rounded-full bg-amber animate-pulse shrink-0" aria-hidden />
-            <span><b>ASAP, today</b><br /><span className={slotKey === "asap" ? "text-white/85" : "text-muted"}>Cody is out now. Order by {formatTime(asapUntil)}.</span></span>
+            <span><b>ASAP, today</b><br /><span className={slotKey === "asap" ? "text-white/85" : "text-muted"}>I&apos;m out now. Order by {formatTime(asapUntil)}.</span></span>
           </label>
         )}
         {byDate.length === 0 && !asapUntil && <p className="bg-amber-soft rounded-2xl p-4">No delivery windows are open right now. Check back soon.</p>}
@@ -103,11 +103,11 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
 
       <p className="bg-card border border-line rounded-2xl p-4 text-sm">
         Substitution choices are set per item in your <Link href="/cart" className="underline font-bold">cart</Link>.
-        {" "}{cart.items.filter((i) => (i.subChoice ?? "codys_pick") === "codys_pick").length} of {cart.items.length} items are set to Cody&apos;s pick.
+        {" "}{cart.items.filter((i) => (i.subChoice ?? "codys_pick") === "codys_pick").length} of {cart.items.length} items are set to &ldquo;Let me pick.&rdquo;
       </p>
 
       <div>
-        <label htmlFor="notes" className="text-xl font-extrabold block mb-2">Notes for Cody</label>
+        <label htmlFor="notes" className="text-xl font-extrabold block mb-2">Anything I should know?</label>
         <textarea id="notes" className="field min-h-24" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500}
           placeholder="Anything that helps: “ripe avocados for tonight”, “paper bags please”" />
       </div>
@@ -129,7 +129,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
       <div className="bg-card border border-line rounded-3xl p-5 space-y-4">
         <OrderSummary items={cart.items} tiers={tiers} bufferPct={bufferPct} tipCents={tip} secondStoreFeeCents={secondStoreFeeCents} addOn={cart.addOn} />
         <p className="text-sm text-muted">
-          Your card is held for the estimate plus {bufferPct}%{cart.items.some((i) => i.chain === "meijer") ? ` (${bufferPct + meijerExtraBufferPct}% on Meijer items, since their prices are estimates)` : ""} to cover weighed produce and price changes. You&apos;re only charged the receipt total after Cody shops.
+          Your card is held for the estimate plus {bufferPct}%{cart.items.some((i) => i.chain === "meijer") ? ` (${bufferPct + meijerExtraBufferPct}% on Meijer items, since their prices are estimates)` : ""} to cover weighed produce and price changes. You&apos;re only charged the receipt total after I shop.
         </p>
         {paymentsOn ? (
           <div className="space-y-2">

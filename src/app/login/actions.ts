@@ -25,7 +25,7 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   const password = String(form.get("password") ?? "");
   const fullName = String(form.get("full_name") ?? "").trim();
   const phone = String(form.get("phone") ?? "").trim();
-  if (!fullName) return { error: "Enter your name so Cody knows who the order is for." };
+  if (!fullName) return { error: "Enter your name so I know who the order is for." };
   if (password.length < 8) return { error: "Use a password with at least 8 characters." };
 
   const origin = (await headers()).get("origin") ?? "";

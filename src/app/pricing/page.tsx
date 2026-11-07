@@ -17,7 +17,7 @@ export default async function PricingPage() {
       </header>
       <PricingDetails tiers={tiers} secondStoreFeeCents={settings.secondStoreFeeCents} bufferPct={settings.authBufferPct} />
       <p className="text-sm text-muted">
-        Changed your mind? You can cancel for free until Cody starts shopping. See the <Link href="/refunds" className="underline">refund policy</Link>.
+        Changed your mind? You can cancel for free until I start shopping. See the <Link href="/refunds" className="underline">refund policy</Link>.
       </p>
       <Link href="/login" className="btn btn-primary">Create an account</Link>
     </div>
