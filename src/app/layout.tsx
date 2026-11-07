@@ -7,9 +7,9 @@ import { CartProvider } from "@/lib/cart";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "Speedy Turtle",
+  title: "Redbird Grocery",
   description: "Kroger and Meijer groceries, shopped and delivered by Cody.",
-  appleWebApp: { capable: true, title: "Speedy Turtle", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Redbird", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = { themeColor: "#1f5a40", width: "device-width", initialScale: 1 };

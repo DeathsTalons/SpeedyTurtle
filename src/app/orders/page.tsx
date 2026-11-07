@@ -5,7 +5,7 @@ import { money } from "@/lib/money";
 import { formatDate, clockLabel } from "@/lib/format";
 import { STATUS } from "@/lib/order-status";
 
-export const metadata = { title: "Orders · Speedy Turtle" };
+export const metadata = { title: "Orders · Redbird Grocery" };
 
 export default async function OrdersPage() {
   const db = await supabaseServer();

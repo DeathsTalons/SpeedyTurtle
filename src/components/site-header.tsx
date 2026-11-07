@@ -3,14 +3,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart";
 
-function TurtleMark() {
-  // Hexagon shell — the brand mark.
+function RedbirdMark() {
+  // Cardinal (Indiana's state bird) — the brand mark. Same drawing as app/icon.svg.
   return (
-    <svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true">
-      <ellipse cx="33" cy="22" rx="5" ry="4" fill="#1f5a40" />
-      <path d="M8 30 l-3 4 M28 30 l3 4 M8 14 l-3 -3" stroke="#1f5a40" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M18 7 L28 12.5 L28 26 L18 31.5 L8 26 L8 12.5 Z" fill="#d99a2b" stroke="#163f2d" strokeWidth="2.5" strokeLinejoin="round" />
-      <path d="M18 14 L23 17 L23 22 L18 25 L13 22 L13 17 Z" fill="#f6e3bd" stroke="#163f2d" strokeWidth="1.8" strokeLinejoin="round" />
+    <svg viewBox="2 3 37 34" width="36" height="33" aria-hidden="true">
+      <path d="M13.5 26 L3.5 33.5 L6 36 L17 30.5 Z" fill="#8e1c22" />
+      <path d="M10 27 C9 19 13 13 19 11.5 L17 3.5 L23.5 9.3 C28.5 9.3 32 12.5 32.5 17 C33 24 28.5 31 20 31.5 C15 31.8 11 30.5 10 27 Z" fill="#c62a30" />
+      <path d="M13 22 C16 18 22 18 25.5 21 C22.5 26 17 28 12.5 27.5 Z" fill="#9f2026" />
+      <path d="M26.5 13.2 C28.5 12.6 30.5 13 31.6 14 L33 15.6 L33 20.8 C31.5 22.6 28.6 22.4 27.4 20.6 C26.2 18.6 25.9 15.4 26.5 13.2 Z" fill="#1b1b1b" />
+      <path d="M31.8 14.6 L38.5 17.6 L31.8 20.6 C31.2 18.6 31.2 16.6 31.8 14.6 Z" fill="#f2a33a" />
+      <circle cx="28.9" cy="15.6" r="1.15" fill="#fff" />
+      <path d="M18 31 L17.2 35.5 M22 31 L22.6 35.5" stroke="#5a3a1c" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
@@ -40,8 +43,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-20 bg-paper/95 backdrop-blur border-b border-line">
       <div className={`${admin ? "max-w-6xl" : "max-w-3xl"} mx-auto px-4 h-16 flex items-center gap-3`}>
         <Link href={admin ? "/admin" : "/"} className="flex items-center gap-2 mr-auto">
-          <TurtleMark />
-          <span className="font-display text-xl font-extrabold text-shell-dark">Speedy Turtle</span>
+          <RedbirdMark />
+          <span className="font-display text-xl font-extrabold text-shell-dark">Redbird <span className="text-[var(--cardinal)]">Grocery</span></span>
         </Link>
         <nav className={`hidden ${admin ? "md:flex" : "sm:flex"} items-center gap-1`} aria-label="Main">
           {NAV.map((n) => (

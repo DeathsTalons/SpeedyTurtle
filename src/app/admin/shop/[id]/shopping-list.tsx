@@ -276,7 +276,7 @@ export function ShoppingList({ batchId, orders, initialLines }: { batchId: strin
 function SwapForm({ line, upc, onSave, onCancel }: { line: Line; upc?: string; onSave: (name: string, price: string) => void; onCancel: () => void }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const ask = smsLink(line.phone, `Hi ${line.firstName}, it's Cody from Speedy Turtle. ${line.name} is out. ${name ? `Is ${name} OK instead?` : "Want me to grab something similar?"}`);
+  const ask = smsLink(line.phone, `Hi ${line.firstName}, it's Cody from Redbird Grocery. ${line.name} is out. ${name ? `Is ${name} OK instead?` : "Want me to grab something similar?"}`);
   return (
     <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); if (name.trim()) onSave(name.trim(), price); }}>
       <h2 className="text-xl font-extrabold">Swap {line.name}</h2>

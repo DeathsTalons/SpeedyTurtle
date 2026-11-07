@@ -1,6 +1,6 @@
 import { AuthForms } from "./auth-forms";
 
-export const metadata = { title: "Sign in · Speedy Turtle" };
+export const metadata = { title: "Sign in · Redbird Grocery" };
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const { next } = await searchParams;

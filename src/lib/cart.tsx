@@ -46,6 +46,7 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
+// Old-name keys kept on purpose: renaming them would empty carts already saved in browsers.
 const STORAGE_KEY = "speedy-turtle-cart-v1";
 const PRIMARY_KEY = "speedy-turtle-store-v1";
 export const otherChain = (c: Chain): Chain => (c === "kroger" ? "meijer" : "kroger");

@@ -47,7 +47,7 @@ export async function authorizeOrder(orderId: string): Promise<{ ok: true } | { 
     const pi = await stripe()!.paymentIntents.create({
       amount: o.authorized_amount_cents, currency: "usd", customer, payment_method: o.stripe_payment_method_id,
       capture_method: "manual", confirm: true, off_session: true,
-      description: "Speedy Turtle grocery order (hold)", metadata: { order_id: o.id },
+      description: "Redbird Grocery order (hold)", metadata: { order_id: o.id },
     }, { idempotencyKey: `hold-${o.id}-${o.stripe_payment_method_id}-${o.authorized_amount_cents}-${Math.floor(Date.now() / 60_000)}` });
     if (pi.status !== "requires_capture") throw new Error(`Unexpected status ${pi.status}`);
     await db().from("orders").update({ payment_status: "authorized", stripe_payment_intent_id: pi.id, authorized_at: new Date().toISOString(), payment_error: null }).eq("id", o.id);
@@ -132,7 +132,7 @@ export async function chargeExtra(orderId: string, cents: number) {
   try {
     pi = await stripe()!.paymentIntents.create({
       amount: cents, currency: "usd", customer, payment_method: o.stripe_payment_method_id, confirm: true, off_session: true,
-      description: "Speedy Turtle grocery order (difference over the hold)", metadata: { order_id: o.id, kind: "extra" },
+      description: "Redbird Grocery order (difference over the hold)", metadata: { order_id: o.id, kind: "extra" },
     }, { idempotencyKey: `extra-${o.id}-${cents}-${Date.now()}` });
   } catch (e) {
     throw new Error(friendly(e));
@@ -164,7 +164,7 @@ export async function chargeLaterTip(orderId: string, cents: number): Promise<{ 
   try {
     pi = await s.paymentIntents.create({
       amount: cents, currency: "usd", customer, payment_method: o.stripe_payment_method_id, confirm: true, off_session: true,
-      description: "Speedy Turtle tip, thank you!", metadata: { order_id: o.id, kind: "tip" },
+      description: "Redbird Grocery tip, thank you!", metadata: { order_id: o.id, kind: "tip" },
     }, { idempotencyKey: `tip-${o.id}-${cents}-${Math.floor(Date.now() / 60_000)}` }); // double-taps charge once; a retry later can try again
   } catch (e) {
     return { ok: false, error: friendly(e) };

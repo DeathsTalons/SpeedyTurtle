@@ -8,7 +8,7 @@ import { money } from "@/lib/money";
 import { TipNote } from "@/components/tip-note";
 import { acknowledgeFees } from "./actions";
 
-export const metadata = { title: "How pricing works · Speedy Turtle" };
+export const metadata = { title: "How pricing works · Redbird Grocery" };
 
 const range = (min: number, max: number | null) =>
   max == null ? `${min}+ items` : min <= 1 ? `Up to ${max} items` : `${min}–${max} items`;

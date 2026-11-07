@@ -6,7 +6,7 @@ import { signOut } from "../login/actions";
 import { deleteAddress, makeDefault } from "./actions";
 import { AddressForm, ProfileForm } from "./forms";
 
-export const metadata = { title: "Account · Speedy Turtle" };
+export const metadata = { title: "Account · Redbird Grocery" };
 
 export default async function AccountPage() {
   const db = await supabaseServer();

@@ -39,7 +39,7 @@ export async function addAddress(_: FormState, form: FormData): Promise<FormStat
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: settings } = await (supabaseAdmin() as any).from("settings").select("service_area_zips").single();
   const zips: string[] = settings?.service_area_zips ?? [];
-  if (zips.length > 0 && !zips.includes(addr.zip)) return { error: `Speedy Turtle doesn't deliver to ${addr.zip} yet.` };
+  if (zips.length > 0 && !zips.includes(addr.zip)) return { error: `Redbird Grocery doesn't deliver to ${addr.zip} yet.` };
 
   const point = await geocodeAddress(addr);
   const { count } = await db.from("addresses").select("id", { count: "exact", head: true }).eq("user_id", user.id);

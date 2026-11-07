@@ -4,7 +4,7 @@ import { customerContext, ensureFeesSeen, secondStoreRules } from "@/lib/custome
 import { getFeeTiers, getSettings } from "@/lib/data";
 import { CartView } from "./cart-view";
 
-export const metadata = { title: "Cart · Speedy Turtle" };
+export const metadata = { title: "Cart · Redbird Grocery" };
 
 export default async function CartPage() {
   await connection(); // fees can change; read them fresh

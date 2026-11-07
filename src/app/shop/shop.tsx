@@ -239,7 +239,7 @@ function Suggestions({ chain, primary, onSearch }: { chain: Chain; primary: Chai
       </div>
       {!ready && <p className="text-muted">Loading your usuals…</p>}
       {ready && section("Buy again", data.buyAgain)}
-      {ready && section(data.buyAgain.length ? `Popular at ${CHAIN_NAME[chain]}` : `Popular with Speedy Turtle customers`, data.popular)}
+      {ready && section(data.buyAgain.length ? `Popular at ${CHAIN_NAME[chain]}` : `Popular with Redbird customers`, data.popular)}
     </div>
   );
 }

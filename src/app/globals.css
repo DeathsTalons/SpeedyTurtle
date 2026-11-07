@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Speedy Turtle palette — shell green + shell amber on shopping-list paper */
+/* Redbird Grocery palette — deep green + warm amber on shopping-list paper, cardinal red for the bird */
 :root {
   --font-bricolage: "Bricolage Grotesque Variable";
   --font-atkinson: "Atkinson Hyperlegible";
@@ -11,7 +11,8 @@
   --line: #cdd8c8;       /* borders */
   --shell: #1f5a40;      /* primary green */
   --shell-dark: #163f2d;
-  --amber: #d99a2b;      /* turtle-shell accent */
+  --amber: #d99a2b;      /* warm accent */
+  --cardinal: #c62a30;   /* the redbird */
   --amber-soft: #f6e3bd;
   --danger: #a33a2a;
   --kroger: #1f4fa3;     /* store tags */

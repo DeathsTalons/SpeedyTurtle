@@ -5,7 +5,7 @@ import { clockLabel } from "@/lib/format";
 import { CheckoutForm, type SlotOption } from "./checkout-form";
 import { paymentsEnabled } from "@/lib/stripe";
 
-export const metadata = { title: "Checkout · Speedy Turtle" };
+export const metadata = { title: "Checkout · Redbird Grocery" };
 
 export default async function CheckoutPage() {
   const ctx = await customerContext();

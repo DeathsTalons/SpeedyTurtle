@@ -8,7 +8,7 @@ import { subLabel } from "@/lib/shopping";
 import { paymentsEnabled } from "@/lib/stripe";
 import { TipAfter } from "./tip-after";
 
-export const metadata = { title: "Order · Speedy Turtle" };
+export const metadata = { title: "Order · Redbird Grocery" };
 
 const ITEM_STATUS: Record<string, string> = { pending: "", found: "Found", substituted: "Swapped", out_of_stock: "Out of stock" };
 

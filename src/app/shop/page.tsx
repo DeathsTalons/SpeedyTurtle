@@ -4,7 +4,7 @@ import { getAvailability, getSettings } from "@/lib/data";
 import { AvailableBanner } from "@/components/available-banner";
 import { Shop } from "./shop";
 
-export const metadata = { title: "Shop · Speedy Turtle" };
+export const metadata = { title: "Shop · Redbird Grocery" };
 
 export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
   const { addon } = await searchParams;

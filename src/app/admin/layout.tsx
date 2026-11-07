@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 
-export const metadata = { title: "Admin · Speedy Turtle" };
+export const metadata = { title: "Admin · Redbird Grocery" };
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   await requireAdmin();
