@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { customerContext, secondStoreRules } from "@/lib/customer";
+import { customerContext, ensureFeesSeen, secondStoreRules } from "@/lib/customer";
 import { getAvailability, getSettings } from "@/lib/data";
 import { AvailableBanner } from "@/components/available-banner";
 import { Shop } from "./shop";
@@ -10,6 +10,7 @@ export default async function ShopPage({ searchParams }: PageProps<"/shop">) {
   const { addon } = await searchParams;
   const ctx = await customerContext();
   if (!ctx) redirect("/login?next=/shop");
+  await ensureFeesSeen(ctx, "/shop");
   const settings = await getSettings();
   return (
     <>

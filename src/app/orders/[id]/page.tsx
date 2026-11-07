@@ -5,6 +5,8 @@ import { money } from "@/lib/money";
 import { formatDate, clockLabel } from "@/lib/format";
 import { STATUS } from "@/lib/order-status";
 import { subLabel } from "@/lib/shopping";
+import { paymentsEnabled } from "@/lib/stripe";
+import { TipAfter } from "./tip-after";
 
 export const metadata = { title: "Order · Speedy Turtle" };
 
@@ -94,7 +96,14 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
             : o.payment_status === "failed" ? "Your card couldn't be held. Cody will text you."
             : o.final_total_cents == null ? `Estimated hold: ${money(o.authorized_amount_cents)}. Final charge is the receipt total.` : null}
         </p>
+        {o.later_tip_cents > 0 && (
+          <div className="flex justify-between border-t border-line pt-2 font-bold text-shell">
+            <span>Tip added after delivery</span><span>{money(o.later_tip_cents)}</span>
+          </div>
+        )}
       </section>
+
+      {o.status === "delivered" && !(o.later_tip_cents > 0) && (!paymentsEnabled() || o.stripe_payment_method_id) && <TipAfter orderId={o.id} />}
 
       <Link href="/orders" className="btn btn-ghost">All orders</Link>
     </div>

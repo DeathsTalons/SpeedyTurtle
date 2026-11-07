@@ -61,6 +61,7 @@ export function Board({ orders, today, openTrips }: { orders: BoardOrder[]; toda
                         <button className="underline text-shell" disabled={pending} onClick={() => start(() => setOrderStatus(o.id, "delivered"))}>Mark delivered</button>
                       )}
                       {o.phone && <a className="underline" href={`sms:${o.phone}`}>Text</a>}
+                      <Link href={`/admin/orders/${o.id}`} className="underline">Details</Link>
                     </div>
                   </div>
                 </li>

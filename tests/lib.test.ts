@@ -32,6 +32,19 @@ test("tier boundaries", () => {
   assert.equal(quoteOrder(lines(36), tiers, { bufferPct: 15 }).serviceFeeCents, 2000);
 });
 
+test("Nov 2026 fee tiers (migration 0015): $15 / $30 / $40 / $50 / $60", () => {
+  const current: FeeTier[] = [
+    { minItems: 1, maxItems: 10, feeCents: 1500, label: "Quick Trip" },
+    { minItems: 11, maxItems: 25, feeCents: 3000, label: "Regular Run" },
+    { minItems: 26, maxItems: 40, feeCents: 4000, label: "Big Shop" },
+    { minItems: 41, maxItems: 60, feeCents: 5000, label: "Stock-Up" },
+    { minItems: 61, maxItems: null, feeCents: 6000, label: "Full Haul" },
+  ];
+  const lines = (n: number) => Array.from({ length: n }, (_, i) => ({ chain: "kroger" as const, productId: `p${i}`, quantity: 3, unitPriceCents: 100 }));
+  const fee = (n: number) => quoteOrder(lines(n), current, { bufferPct: 15 }).serviceFeeCents;
+  assert.deepEqual([1, 10, 11, 25, 26, 40, 41, 60, 61, 150].map(fee), [1500, 1500, 3000, 3000, 4000, 4000, 5000, 5000, 6000, 6000]);
+});
+
 test("authorization adds buffer on groceries only", () => {
   const q = quoteOrder([{ chain: "kroger", productId: "a", quantity: 2, unitPriceCents: 5000 }], tiers, { bufferPct: 15, tipCents: 500 });
   assert.equal(q.estimatedSubtotalCents, 10000);

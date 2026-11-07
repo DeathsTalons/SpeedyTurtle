@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
-import { customerContext, secondStoreRules } from "@/lib/customer";
+import { customerContext, ensureFeesSeen, secondStoreRules } from "@/lib/customer";
 import { getFeeTiers, getSettings } from "@/lib/data";
 import { CartView } from "./cart-view";
 
@@ -10,6 +10,7 @@ export default async function CartPage() {
   await connection(); // fees can change; read them fresh
   const ctx = await customerContext();
   if (!ctx) redirect("/login?next=/cart");
+  await ensureFeesSeen(ctx, "/cart");
   const [tiers, settings] = await Promise.all([getFeeTiers(), getSettings()]);
   return (
     <>

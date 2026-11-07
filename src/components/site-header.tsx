@@ -21,9 +21,11 @@ const CUSTOMER_NAV = [
   { href: "/account", label: "Account" },
 ];
 const ADMIN_NAV = [
-  { href: "/admin", label: "Orders", exact: true },
-  { href: "/admin/calendar", label: "Calendar" },
+  { href: "/admin", label: "Upcoming", exact: true },
   { href: "/admin/shop", label: "Shopping" },
+  { href: "/admin/calendar", label: "Calendar" },
+  { href: "/admin/orders", label: "History" },
+  { href: "/admin/customers", label: "Customers" },
 ];
 
 export function SiteHeader() {
@@ -36,12 +38,12 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-20 bg-paper/95 backdrop-blur border-b border-line">
-      <div className="max-w-3xl mx-auto px-4 h-16 flex items-center gap-3">
+      <div className={`${admin ? "max-w-6xl" : "max-w-3xl"} mx-auto px-4 h-16 flex items-center gap-3`}>
         <Link href={admin ? "/admin" : "/"} className="flex items-center gap-2 mr-auto">
           <TurtleMark />
           <span className="font-display text-xl font-extrabold text-shell-dark">Speedy Turtle</span>
         </Link>
-        <nav className="hidden sm:flex items-center gap-1" aria-label="Main">
+        <nav className={`hidden ${admin ? "md:flex" : "sm:flex"} items-center gap-1`} aria-label="Main">
           {NAV.map((n) => (
             <Link key={n.href} href={n.href}
               className={`px-3 py-2 rounded-full font-bold ${isActive(n) ? "bg-card text-shell" : "text-muted hover:text-ink"}`}>
@@ -59,10 +61,10 @@ export function SiteHeader() {
         )}
       </div>
       {/* Phone nav */}
-      <nav className="sm:hidden flex border-t border-line" aria-label="Main">
+      <nav className={`${admin ? "md:hidden" : "sm:hidden"} flex border-t border-line`} aria-label="Main">
         {NAV.map((n) => (
           <Link key={n.href} href={n.href}
-            className={`flex-1 text-center py-2.5 font-bold ${isActive(n) ? "text-shell border-b-[3px] border-amber" : "text-muted"}`}>
+            className={`flex-1 text-center py-2.5 font-bold ${admin ? "text-[13px]" : ""} ${isActive(n) ? "text-shell border-b-[3px] border-amber" : "text-muted"}`}>
             {n.label}
           </Link>
         ))}

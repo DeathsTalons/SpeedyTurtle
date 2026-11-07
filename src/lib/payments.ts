@@ -141,6 +141,39 @@ export async function chargeExtra(orderId: string, cents: number) {
   await db().from("orders").update({ extra_charge_payment_intent_id: pi.id, captured_cents: (o.captured_cents ?? 0) + cents }).eq("id", o.id);
 }
 
+/**
+ * A tip the customer adds after delivery: its own charge on the saved card, separate from the groceries.
+ * One per order. Without card payments (test mode) it's just recorded.
+ */
+export async function chargeLaterTip(orderId: string, cents: number): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { data: o } = await db().from("orders")
+    .select("id, stripe_payment_method_id, later_tip_cents, later_tip_payment_intent_id, profiles(stripe_customer_id)")
+    .eq("id", orderId).single();
+  if (!o) return { ok: false, error: "Order not found." };
+  if (o.later_tip_cents > 0 || o.later_tip_payment_intent_id) return { ok: false, error: "You've already added a tip to this order. Thank you!" };
+
+  const s = stripe();
+  const customer = (Array.isArray(o.profiles) ? o.profiles[0] : o.profiles)?.stripe_customer_id;
+  if (!s || !o.stripe_payment_method_id || !customer) {
+    if (s) return { ok: false, error: "There's no saved card on this order." };
+    await db().from("orders").update({ later_tip_cents: cents, later_tip_at: new Date().toISOString() }).eq("id", orderId);
+    return { ok: true };
+  }
+
+  let pi: Stripe.PaymentIntent;
+  try {
+    pi = await s.paymentIntents.create({
+      amount: cents, currency: "usd", customer, payment_method: o.stripe_payment_method_id, confirm: true, off_session: true,
+      description: "Speedy Turtle tip, thank you!", metadata: { order_id: o.id, kind: "tip" },
+    }, { idempotencyKey: `tip-${o.id}-${cents}-${Math.floor(Date.now() / 60_000)}` }); // double-taps charge once; a retry later can try again
+  } catch (e) {
+    return { ok: false, error: friendly(e) };
+  }
+  if (pi.status !== "succeeded") return { ok: false, error: "The tip didn't go through. Try again in a minute." };
+  await db().from("orders").update({ later_tip_cents: cents, later_tip_payment_intent_id: pi.id, later_tip_at: new Date().toISOString() }).eq("id", orderId);
+  return { ok: true };
+}
+
 /** Release the hold when an order is canceled. */
 export async function releaseHold(orderId: string) {
   const { data: o } = await db().from("orders").select("payment_status, stripe_payment_intent_id").eq("id", orderId).single();

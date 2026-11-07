@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart, money } from "@/lib/cart";
 import { OrderSummary } from "@/components/order-summary";
+import { TipNote } from "@/components/tip-note";
 import type { FeeTier } from "@/lib/pricing";
 import { formatDate, formatTime } from "@/lib/format";
 import { placeOrder } from "./actions";
@@ -121,6 +122,8 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
             </button>
           ))}
         </div>
+        <TipNote className="mt-3" />
+        <p className="text-sm text-muted">You can also add one after your groceries arrive, from your order page.</p>
       </fieldset>
 
       <div className="bg-card border border-line rounded-3xl p-5 space-y-4">

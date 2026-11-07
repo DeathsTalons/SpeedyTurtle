@@ -1,4 +1,5 @@
 import "server-only";
+import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { orderStores, storesFor } from "@/lib/data";
 
@@ -14,6 +15,15 @@ export async function customerContext() {
   // Which store the add-on would come from, for an order starting at each chain.
   const addOnStores = { kroger: krogerOrder.meijer, meijer: meijerOrder.kroger };
   return { db, user, address, addresses: addresses ?? [], home, stores, addOnStores };
+}
+
+/**
+ * New accounts see the fee breakdown once before shopping. Sends them to /welcome until they have.
+ * If the column doesn't exist yet (migration 0015 not run), this quietly does nothing.
+ */
+export async function ensureFeesSeen(ctx: { db: Awaited<ReturnType<typeof supabaseServer>>; user: { id: string } }, next: string) {
+  const { data } = await ctx.db.from("profiles").select("fees_seen_at, role").eq("id", ctx.user.id).maybeSingle();
+  if (data && !data.fees_seen_at && data.role !== "admin") redirect(`/welcome?next=${encodeURIComponent(next)}`);
 }
 
 /** For each chain: if an order starts there, may the customer add the other chain? */

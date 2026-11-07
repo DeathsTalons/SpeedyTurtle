@@ -46,7 +46,7 @@ async function handle(event: Stripe.Event) {
       // A hold that expired (or was canceled in the dashboard). The card is still saved,
       // so the next "Save total" places a fresh hold.
       const pi = event.data.object;
-      if (pi.metadata?.kind === "extra") return;
+      if (pi.metadata?.kind === "extra" || pi.metadata?.kind === "tip") return;
       await db().from("orders")
         .update({ payment_status: "card_saved", stripe_payment_intent_id: null, authorized_at: null, payment_error: "The card hold expired; a new one is placed when you save the total." })
         .eq("stripe_payment_intent_id", pi.id).eq("payment_status", "authorized");
@@ -87,11 +87,11 @@ async function handle(event: Stripe.Event) {
 /** The order an intent belongs to: by metadata first, then by the columns that store it. */
 async function orderForIntent(piId: string): Promise<string | null> {
   const { data } = await db().from("orders").select("id")
-    .or(`stripe_payment_intent_id.eq.${piId},extra_charge_payment_intent_id.eq.${piId}`).limit(1).maybeSingle();
+    .or(`stripe_payment_intent_id.eq.${piId},extra_charge_payment_intent_id.eq.${piId},later_tip_payment_intent_id.eq.${piId}`).limit(1).maybeSingle();
   return data?.id ?? null;
 }
 
-/** Sum of refunds across both of the order's charges, straight from Stripe. */
+/** Sum of refunds across the order's grocery charges (main + extra), straight from Stripe. Tips are tracked separately. */
 async function totalRefunded(orderId: string): Promise<number> {
   const s = stripe()!;
   const { data: o } = await db().from("orders").select("stripe_payment_intent_id, extra_charge_payment_intent_id").eq("id", orderId).single();

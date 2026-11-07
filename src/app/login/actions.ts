@@ -33,11 +33,11 @@ export async function signUp(_: AuthState, form: FormData): Promise<AuthState> {
   const { data, error } = await db.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName, phone }, emailRedirectTo: `${origin}/auth/callback?next=/account` },
+    options: { data: { full_name: fullName, phone }, emailRedirectTo: `${origin}/auth/callback?next=/welcome` },
   });
   if (error) return { error: error.message };
 
-  if (data.session) redirect("/account"); // email confirmation turned off
+  if (data.session) redirect("/welcome"); // email confirmation turned off
   return { message: `Check ${email} for a confirmation link, then come back and sign in.` };
 }
 

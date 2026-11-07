@@ -13,3 +13,11 @@ export const clockLabel = (t: string | null | undefined) => {
   const hh = h % 12 || 12;
   return `${hh}${m ? `:${String(m).padStart(2, "0")}` : ""}${h < 12 ? "am" : "pm"}`;
 };
+
+/** Timestamp → "Nov 6, 2026, 11:55 PM" in Cody's time zone. */
+export const formatStamp = (d: string | null | undefined) =>
+  d ? new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: TIMEZONE }) : "—";
+
+/** Timestamp → "Nov 6, 2026" in Cody's time zone. */
+export const formatDay = (d: string | null | undefined) =>
+  d ? new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: TIMEZONE }) : "—";

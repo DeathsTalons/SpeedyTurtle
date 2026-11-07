@@ -61,7 +61,10 @@ export default async function AccountPage() {
         <ProfileForm fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
       </section>
 
-      <form action={signOut}><button className="btn btn-ghost">Sign out</button></form>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/welcome?review=1" className="btn btn-ghost">How pricing works</Link>
+        <form action={signOut}><button className="btn btn-ghost">Sign out</button></form>
+      </div>
     </div>
   );
 }

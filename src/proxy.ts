@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseUrl, supabasePublicKey } from "@/lib/env";
 
-const NEEDS_ACCOUNT = ["/shop", "/cart", "/checkout", "/orders", "/account", "/admin"];
+const NEEDS_ACCOUNT = ["/shop", "/cart", "/checkout", "/orders", "/account", "/admin", "/welcome"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
