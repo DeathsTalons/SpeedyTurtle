@@ -64,7 +64,8 @@ export async function authorizeOrder(orderId: string): Promise<{ ok: true } | { 
  * If the hold expired (Stripe drops them after ~7 days) a fresh one is placed first.
  */
 export async function chargeFinal(orderId: string, totalCents: number, depth = 0): Promise<{ chargedCents: number; overCents: number; note?: string }> {
-  const { data: o } = await db().from("orders").select("payment_status, stripe_payment_intent_id, authorized_amount_cents, captured_cents, refunded_cents").eq("id", orderId).single();
+  // "*" so this keeps working even before migration 0016 adds item_refunds_cents.
+  const { data: o } = await db().from("orders").select("*").eq("id", orderId).single();
   const s = stripe();
   if (!s || !o || o.payment_status === "none") return { chargedCents: 0, overCents: 0, note: "Card payments aren't on for this order." };
   if (depth > 2) return { chargedCents: 0, overCents: totalCents, note: "Couldn't charge the card after several tries." };
@@ -91,13 +92,38 @@ export async function chargeFinal(orderId: string, totalCents: number, depth = 0
   }
 
   // Already charged: lower total → refund the difference; higher → report it for an extra charge.
+  // Items refunded after delivery stay refunded: they come off the total before comparing.
   const net = (o.captured_cents ?? 0) - (o.refunded_cents ?? 0);
-  if (totalCents < net) {
-    const refund = net - totalCents;
+  const target = Math.max(0, totalCents - (o.item_refunds_cents ?? 0));
+  if (target < net) {
+    const refund = net - target;
     await refundOrder(orderId, refund);
-    return { chargedCents: totalCents, overCents: 0, note: `Refunded $${(refund / 100).toFixed(2)} of the earlier charge.` };
+    return { chargedCents: target, overCents: 0, note: `Refunded $${(refund / 100).toFixed(2)} of the earlier charge.` };
   }
-  return { chargedCents: net, overCents: totalCents - net };
+  return { chargedCents: net, overCents: target - net };
+}
+
+/**
+ * Refund one item after delivery (missing, damaged, wrong). Money goes back to the card the order was
+ * charged on; the item and the order both remember it. Without card payments (test mode) it's just recorded.
+ */
+export async function refundItem(orderId: string, itemId: string, cents: number, note: string | null): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { data: o } = await db().from("orders").select("*").eq("id", orderId).single();
+  const { data: it } = await db().from("order_items").select("*").eq("id", itemId).single();
+  if (!o || !it || it.order_id !== o.id) return { ok: false, error: "Item not found on this order." };
+  // Never send money back without being able to record it.
+  if (!("item_refunds_cents" in o) || !("refunded_cents" in it)) return { ok: false, error: "Run database migration 0016 first (Supabase SQL Editor), then try again." };
+
+  const s = stripe();
+  if (s && o.payment_status !== "none") {
+    if (o.payment_status !== "captured") return { ok: false, error: "Save the receipt total first so the order is charged, then refund items." };
+    try { await refundOrder(o.id, cents); }
+    catch (e) { return { ok: false, error: (e as Error).message || "The refund didn't go through." }; }
+  }
+  const now = new Date().toISOString();
+  await db().from("order_items").update({ refunded_cents: (it.refunded_cents ?? 0) + cents, refund_note: note, refunded_at: now }).eq("id", it.id);
+  await db().from("orders").update({ item_refunds_cents: (o.item_refunds_cents ?? 0) + cents, updated_at: now }).eq("id", o.id);
+  return { ok: true };
 }
 
 /** Refund across the main charge and any extra charge, whichever still has money on it. */

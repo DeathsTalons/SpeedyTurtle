@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin";
 import { finalCaptureCents } from "@/lib/pricing";
-import { authorizeOrder, chargeExtra, chargeFinal, releaseHold } from "@/lib/payments";
+import { authorizeOrder, chargeExtra, chargeFinal, refundItem, releaseHold } from "@/lib/payments";
 import { paymentsEnabled } from "@/lib/stripe";
 
 const clip = (s: unknown, n: number) => (typeof s === "string" ? s.trim().slice(0, n) : "");
@@ -97,6 +97,18 @@ export async function chargeOverHold(orderId: string, cents: number) {
   if (!(cents > 0 && cents < 100_000)) throw new Error("Bad amount.");
   await chargeExtra(orderId, Math.round(cents));
   revalidatePath("/admin");
+}
+
+/** Refund one item after a customer reports it missing, damaged or wrong. */
+export async function refundOrderItem(orderId: string, itemId: string, amount: string, note: string): Promise<{ ok?: true; error?: string }> {
+  await assertAdmin();
+  const c = cents(amount);
+  if (!c || c > 50_000) return { error: "Enter an amount between $0.01 and $500." };
+  const r = await refundItem(clip(orderId, 40), clip(itemId, 40), c, clip(note, 200) || null);
+  if (!r.ok) return { error: r.error };
+  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath("/admin");
+  return { ok: true };
 }
 
 export async function setOrderStatus(orderId: string, status: "placed" | "shopping" | "delivering" | "delivered" | "canceled") {

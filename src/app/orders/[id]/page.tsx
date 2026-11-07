@@ -32,7 +32,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
   const addr = one(o.addresses);
   const kroger = one(o.kroger);
   const meijer = one(o.meijer);
-  type Item = { id: string; chain: string; quantity: number; name_snapshot: string; item_note: string | null; substitute_name: string | null; status: string; unit_price_cents_snapshot: number | null; sub_choice: string; removed: boolean; approved_subs: { name: string }[] | null };
+  type Item = { id: string; chain: string; quantity: number; name_snapshot: string; item_note: string | null; substitute_name: string | null; status: string; unit_price_cents_snapshot: number | null; sub_choice: string; removed: boolean; approved_subs: { name: string }[] | null; refunded_cents: number };
   const items: Item[] = (o.order_items ?? []).filter((i: Item) => !i.removed);
   const s = STATUS[o.status];
 
@@ -69,6 +69,7 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
                     {i.name_snapshot}
                     <span className="block text-sm text-muted">If out: {subLabel(i.sub_choice)}{i.approved_subs?.length ? ` (${i.approved_subs.map((x) => x.name).join(", ")})` : ""}{i.item_note ? ` · “${i.item_note}”` : ""}</span>
                     {i.substitute_name && <span className="block text-sm">Swapped for {i.substitute_name}</span>}
+                    {i.refunded_cents > 0 && <span className="block text-sm font-bold text-shell">Refunded {money(i.refunded_cents)}</span>}
                   </span>
                   <span className="text-sm text-right">
                     {ITEM_STATUS[i.status] && <span className="block font-bold">{ITEM_STATUS[i.status]}</span>}
@@ -86,9 +87,10 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
         <div className="flex justify-between"><span>Service fee · {o.unique_item_count} items</span><span>{money(o.service_fee_cents)}</span></div>
         {o.second_store_fee_cents > 0 && <div className="flex justify-between"><span>Second store</span><span>{money(o.second_store_fee_cents)}</span></div>}
         {o.tip_cents > 0 && <div className="flex justify-between"><span>Tip</span><span>{money(o.tip_cents)}</span></div>}
+        {o.item_refunds_cents > 0 && <div className="flex justify-between text-shell font-bold"><span>Refunded items</span><span>−{money(o.item_refunds_cents)}</span></div>}
         <div className="flex justify-between text-lg font-bold border-t border-line pt-2">
           <span>{o.final_total_cents == null ? "Estimated total" : "Total charged"}</span>
-          <span>{money(o.final_total_cents ?? o.estimated_subtotal_cents + o.service_fee_cents + (o.second_store_fee_cents ?? 0) + o.tip_cents)}</span>
+          <span>{money((o.final_total_cents ?? o.estimated_subtotal_cents + o.service_fee_cents + (o.second_store_fee_cents ?? 0) + o.tip_cents) - (o.item_refunds_cents ?? 0))}</span>
         </div>
         <p className="text-sm text-muted">
           {o.payment_status === "captured" ? `Charged ${money((o.captured_cents ?? 0) - (o.refunded_cents ?? 0))} to your card.`

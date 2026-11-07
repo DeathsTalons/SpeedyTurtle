@@ -9,7 +9,7 @@ import { kroger } from "@/lib/kroger-server";
 import { meijer } from "@/lib/meijer-server";
 import { quoteOrder, type CartLine } from "@/lib/pricing";
 import { addDays, localDate, weekdayOf } from "@/lib/schedule";
-import { paymentsEnabled, HOLD_AT_CHECKOUT_WITHIN_DAYS } from "@/lib/stripe";
+import { paymentsEnabled, stripeTestMode, HOLD_AT_CHECKOUT_WITHIN_DAYS } from "@/lib/stripe";
 import { authorizeOrder, createCardSetup, verifyPaymentMethod } from "@/lib/payments";
 import { MAX_APPROVED_SUBS, SUB_CHOICES, type ApprovedSub, type SubChoice } from "@/lib/shopping";
 
@@ -52,9 +52,18 @@ async function mapLimit<T, R>(list: T[], limit: number, fn: (t: T) => Promise<R>
   return out;
 }
 
+const MIXED_UP =
+  "This copy of the site is using TEST card keys but is connected to the LIVE database, so checkout is turned off to protect real customer accounts. Point .env.local at your test database (see README, Test database).";
+
+/** Test Stripe keys + the live database = test card data on real accounts. Never allow that. */
+async function mixedUp() {
+  return paymentsEnabled() && stripeTestMode() && (await getSettings()).environment === "live";
+}
+
 /** Starts the card form at checkout. */
 export async function startCardSetup(): Promise<{ clientSecret?: string; error?: string }> {
   if (!paymentsEnabled()) return {};
+  if (await mixedUp()) return { error: MIXED_UP };
   const ctx = await customerContext();
   if (!ctx) return { error: "Sign in again." };
   try { return { clientSecret: await createCardSetup(ctx.user.id, ctx.user.email) }; }
@@ -64,6 +73,7 @@ export async function startCardSetup(): Promise<{ clientSecret?: string; error?:
 export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> {
   const ctx = await customerContext();
   if (!ctx) return { error: "Sign in again to place your order." };
+  if (await mixedUp()) return { error: MIXED_UP };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = supabaseAdmin() as any;
 

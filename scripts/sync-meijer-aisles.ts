@@ -3,9 +3,9 @@
 // If Meijer blocks it anyway, it stops; aisles can always be set by hand in shopping mode.
 // Leave the Edge window alone while it runs.
 //
-//   node --env-file=.env.local scripts/sync-meijer-aisles.ts          ← items in upcoming orders
-//   node --env-file=.env.local scripts/sync-meijer-aisles.ts --all    ← every Meijer item ever ordered
-//   node --env-file=.env.local scripts/sync-meijer-aisles.ts --list data/meijer-baseline.txt
+//   node --env-file=.env.live scripts/sync-meijer-aisles.ts          ← items in upcoming orders
+//   node --env-file=.env.live scripts/sync-meijer-aisles.ts --all    ← every Meijer item ever ordered
+//   node --env-file=.env.live scripts/sync-meijer-aisles.ts --list data/meijer-baseline.txt
 //        ← search each line, take the top matches, look them up at EVERY Meijer (baseline map)
 //        options: --per 2 (matches per line)   --store brownsburg (just one store)
 //

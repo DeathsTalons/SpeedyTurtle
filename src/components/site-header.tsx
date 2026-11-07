@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart";
@@ -36,7 +37,16 @@ export function SiteHeader() {
   const { items, ready } = useCart();
   const count = items.length;
   const admin = path.startsWith("/admin");
-  const NAV = admin ? ADMIN_NAV : CUSTOMER_NAV;
+  // Show an "Admin" link on the customer side when Cody is signed in. Checked after the page loads
+  // (and again after each page change, so it appears right after signing in).
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    if (admin) return;
+    let live = true;
+    fetch("/api/me", { cache: "no-store" }).then((r) => r.json()).then((me) => { if (live) setIsAdmin(!!me.admin); }).catch(() => {});
+    return () => { live = false; };
+  }, [path, admin]);
+  const NAV = admin ? ADMIN_NAV : isAdmin ? [...CUSTOMER_NAV, { href: "/admin", label: "Admin" }] : CUSTOMER_NAV;
   const isActive = (n: { href: string; exact?: boolean }) => (n.exact ? path === n.href : path.startsWith(n.href));
 
   return (
@@ -55,7 +65,7 @@ export function SiteHeader() {
           ))}
         </nav>
         {admin ? (
-          <span className="text-sm font-bold bg-amber-soft px-3 py-1 rounded-full">Cody</span>
+          <Link href="/shop" className="text-sm font-bold bg-amber-soft px-3 py-1.5 rounded-full hover:bg-amber/40">Store view</Link>
         ) : (
         <Link href="/cart" className="btn btn-primary !px-4" aria-label={`Cart, ${count} items`}>
           Cart

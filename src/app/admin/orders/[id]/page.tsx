@@ -8,6 +8,7 @@ import { PAYMENT } from "@/lib/order-status";
 import { subLabel } from "@/lib/shopping";
 import { stripeDashboard } from "@/lib/stripe";
 import { StatusPill, when } from "../../records-ui";
+import { RefundItem } from "./refund-item";
 
 export const metadata = { title: "Order · Admin" };
 
@@ -16,6 +17,15 @@ const ITEM_STATUS: Record<string, string> = { pending: "Not shopped", found: "Fo
 
 function Row({ label, value, strong }: { label: string; value: React.ReactNode; strong?: boolean }) {
   return <div className={`flex justify-between gap-4 ${strong ? "font-bold text-lg border-t border-line pt-2" : ""}`}><span className={strong ? "" : "text-muted"}>{label}</span><span className="text-right">{value}</span></div>;
+}
+
+/** What a refund for this item would probably be: its price × how many you got, minus anything already refunded. */
+function suggestedRefund(i: any): number | null {
+  const each = i.actual_price_cents ?? i.unit_price_cents_snapshot;
+  if (each == null) return null;
+  const qty = Number(i.found_quantity ?? i.quantity);
+  const left = Math.round(each * qty) - (i.refunded_cents ?? 0);
+  return left > 0 ? left : null;
 }
 
 function StripeLink({ id, label }: { id: string | null; label: string }) {
@@ -32,6 +42,8 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
   const pay = PAYMENT[o.payment_status ?? "none"] ?? { label: o.payment_status, tone: "" };
   const net = (o.captured_cents ?? 0) - (o.refunded_cents ?? 0);
   const active = items.filter((i: any) => !i.removed);
+  // Item refunds open up once the receipt total is saved (the order is charged).
+  const canRefund = m.final && o.status !== "canceled";
   const removed = items.filter((i: any) => i.removed);
 
   return (
@@ -77,6 +89,7 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
           {o.second_store_fee_cents > 0 && <Row label="Second store" value={money(o.second_store_fee_cents)} />}
           <Row label="Tip at checkout" value={money(o.tip_cents)} />
           {o.later_tip_cents > 0 && <Row label={`Tip after delivery (${formatStamp(o.later_tip_at)})`} value={money(o.later_tip_cents)} />}
+          {o.item_refunds_cents > 0 && <Row label="Refunded items" value={<span className="text-danger">−{money(o.item_refunds_cents)}</span>} />}
           <Row strong label={m.final ? "Total" : "Estimated total"} value={money(m.total)} />
           <Row label="You made (fees + tips)" value={<b className="text-shell">{m.final && o.status !== "canceled" ? money(m.earned) : "—"}</b>} />
         </div>
@@ -108,14 +121,20 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
                 {Number(i.quantity)}×
                 {i.found_quantity != null && Number(i.found_quantity) !== Number(i.quantity) && <span className="block text-xs text-danger">got {Number(i.found_quantity)}</span>}
               </span>
-              <span className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0">
                 <span className={`text-xs font-bold uppercase tag-${i.chain}`}>{i.chain}</span>{i.added_by_shopper && <span className="text-xs font-bold text-amber"> · added by you</span>}
                 <span className="block font-bold">{i.name_snapshot}</span>
                 <span className="block text-sm text-muted">If out: {subLabel(i.sub_choice)}{i.approved_subs?.length ? ` (${i.approved_subs.map((x: any) => x.name).join(", ")})` : ""}</span>
                 {i.item_note && <span className="block text-sm">Customer: “{i.item_note}”</span>}
                 {i.substitute_name && <span className="block text-sm">Swapped for <b>{i.substitute_name}</b></span>}
                 {i.shopper_note && <span className="block text-sm">Your note: {i.shopper_note}</span>}
-              </span>
+                {i.refunded_cents > 0 && (
+                  <span className="block text-sm font-bold text-danger">Refunded {money(i.refunded_cents)}{i.refund_note ? ` · ${i.refund_note}` : ""}</span>
+                )}
+                {canRefund && i.status !== "out_of_stock" && (
+                  <RefundItem orderId={o.id} itemId={i.id} name={i.substitute_name || i.name_snapshot} suggestedCents={suggestedRefund(i)} />
+                )}
+              </div>
               <span className="text-sm text-right shrink-0">
                 <span className="block font-bold">{ITEM_STATUS[i.status] ?? i.status}</span>
                 {i.unit_price_cents_snapshot != null ? money(i.unit_price_cents_snapshot * Number(i.quantity)) : "Shelf price"}

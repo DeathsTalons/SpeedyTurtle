@@ -11,7 +11,7 @@ export function orderMoney(o: any) {
   const tips = (o.tip_cents ?? 0) + (o.later_tip_cents ?? 0);
   const groceries = o.final_subtotal_cents ?? o.estimated_subtotal_cents ?? 0;
   const final = o.final_total_cents != null;
-  const total = (o.final_total_cents ?? groceries + fees + (o.tip_cents ?? 0)) + (o.later_tip_cents ?? 0);
+  const total = (o.final_total_cents ?? groceries + fees + (o.tip_cents ?? 0)) + (o.later_tip_cents ?? 0) - (o.item_refunds_cents ?? 0);
   // Only finished, non-canceled orders count toward what Cody actually made.
   const counts = final && o.status !== "canceled";
   return { fees, tips, groceries, total, final, earned: counts ? fees + tips : 0, spent: counts ? total : 0 };
@@ -30,8 +30,7 @@ export async function authUsers(db: any): Promise<Map<string, { email: string | 
 }
 
 const SUMMARY_COLS =
-  "id, customer_id, status, delivery_date, asap, created_at, unique_item_count, payment_status, estimated_subtotal_cents, final_subtotal_cents," +
-  " final_total_cents, service_fee_cents, second_store_fee_cents, tip_cents, later_tip_cents, slot_templates(start_time, end_time)," +
+  "*, slot_templates(start_time, end_time)," +
   " kroger:stores!orders_kroger_store_id_fkey(name), meijer:stores!orders_meijer_store_id_fkey(name)";
 
 export type OrderRow = {
@@ -66,7 +65,7 @@ export type CustomerRow = {
 export async function listCustomers(db: any, q = ""): Promise<CustomerRow[]> {
   const [{ data: profiles, error }, { data: orders }, { data: addresses }, users] = await Promise.all([
     db.from("profiles").select("id, full_name, phone, role, created_at, stripe_customer_id"),
-    db.from("orders").select("customer_id, status, delivery_date, final_total_cents, estimated_subtotal_cents, final_subtotal_cents, service_fee_cents, second_store_fee_cents, tip_cents, later_tip_cents"),
+    db.from("orders").select("*"),
     db.from("addresses").select("user_id, city, is_default"),
     authUsers(db),
   ]);

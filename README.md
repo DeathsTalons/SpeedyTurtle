@@ -30,18 +30,29 @@ update profiles set role = 'admin' where id = (select id from auth.users where e
 
 Then open http://localhost:3000/admin
 
-- **Orders**: check the orders to shop together, tap Shop
+- **Upcoming**: check the orders to shop together, tap Shop
 - **Shopping**: one list by aisle, color-coded by customer; Scan / Found / Swap / Out, add or remove items, set aisles
 - **Calendar**: default week, block days or single 2-hour windows, tap a name to move an order
+- **History**: every order, with filters and what you made; tap one for the full details
+- **Customers**: everyone's contact info, addresses and order history
+
+When you're signed in as admin, the customer side shows an **Admin** link in the menu, and the admin side has a
+**Store view** link back.
+
+**Refunding an item** (the 24-hour missing / damaged / wrong promise): open the order (History → the order, or
+Details on Upcoming), tap **Refund** under the item, check the amount (it's filled in with what that item cost)
+and tap Refund to card. It shows up on the customer's order page. Works once the receipt total has been saved.
 
 The camera scanner needs https (works once the app is online); until then type the barcode number.
 
 ## Meijer aisles
 
-Meijer only shows aisles on its own product pages, so this runs on your PC in a real Edge window:
+Meijer only shows aisles on its own product pages, so this runs on your PC in a real Edge window.
+It saves aisles into the **live** database, so it reads the live keys from `.env.live` (see Test database below;
+until you've set that up, use `.env.local` in its place):
 
 ```
-node --env-file=.env.local scripts/sync-meijer-aisles.ts
+node --env-file=.env.live scripts/sync-meijer-aisles.ts
 ```
 
 Run it the night before or morning of a shopping day. It looks up Meijer items in upcoming orders that
@@ -51,6 +62,29 @@ Add `--all` to fill in every Meijer item ever ordered.
 **Baseline map:** `--list data/meijer-baseline.txt` searches Meijer for each line (about 170 everyday items),
 takes the top 2 matches and looks them up at every Meijer. Roughly 700 pages, a bit over an hour. Ctrl+C anytime;
 rerun to continue. Options: `--per 3` for more matches per line, `--store brownsburg` for one store.
+
+## Test database (try things on your PC without touching real customers)
+
+The live site and your PC should use **different** databases: real customers' accounts must never get test-mode
+card info. The app enforces this: with test Stripe keys, checkout refuses to run against the live database.
+
+One-time setup (about 10 minutes):
+
+1. **Keep your live keys for scripts.** Copy `.env.local` to a new file named `.env.live` (same folder). The Meijer
+   aisle script uses it, so your scraping keeps going to the live database. Both files stay off GitHub.
+2. **Make the test database.** In Supabase, **New project** (free plan is fine), name it `redbird-test`.
+3. **Build it.** Open `supabase/test-database-setup.sql`, copy all of it, paste into the new project's SQL Editor,
+   Run. (It's every migration in one file, and it marks this database as "test". If you add a migration later,
+   run `npm run db:test-setup` to rebuild the file.)
+4. **Point your PC at it.** In `.env.local`, replace the three Supabase values with the new project's
+   (Project Settings → API Keys / Connect). Keep the Stripe **test** keys.
+5. **Store locations:** `node --env-file=.env.local scripts/sync-stores.ts`
+6. **Sign-in settings** in the test project (Authentication → URL Configuration): Site URL `http://localhost:3000`,
+   redirect URL `http://localhost:3000/**`. Under Authentication → Sign In / Providers → Email you can turn
+   **Confirm email** off here, so test accounts work instantly.
+7. `npm run dev`, create an account, then make it admin with the SQL at the top of this page (in the TEST project).
+
+Test orders, cards and refunds now stay entirely in the test project and Stripe's test mode.
 
 ## Card payments (Stripe)
 
@@ -94,3 +128,4 @@ npm run lint
 | `src/app/account` | Addresses (sets nearest stores) and contact details |
 | `src/lib` | Pricing, schedule, stores, Kroger API, database loaders |
 | `supabase/migrations` | Database setup, run in order |
+| `supabase/test-database-setup.sql` | All migrations in one file, for a new test project (`npm run db:test-setup`) |

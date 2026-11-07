@@ -21,6 +21,8 @@ export type Settings = {
   meijerExtraBufferPct: number;
   availableUntil: string | null;
   asapCapacity: number;
+  /** "live" = real customers; "test" = the separate test database. */
+  environment: "live" | "test";
 };
 
 export async function getFeeTiers(): Promise<FeeTier[]> {
@@ -41,6 +43,7 @@ export async function getSettings(): Promise<Settings> {
     meijerExtraBufferPct: data.meijer_extra_buffer_pct ?? 10,
     availableUntil: data.available_until ?? null,
     asapCapacity: data.asap_capacity ?? 2,
+    environment: data.environment === "test" ? "test" : "live",
   };
 }
 

@@ -11,6 +11,9 @@ export function stripe(): Stripe | null {
 }
 export const paymentsEnabled = () => !!stripe() && !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
 
+/** True when the site is running on Stripe TEST keys (your PC), false on live keys. */
+export const stripeTestMode = () => /^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY?.trim() ?? "");
+
 /** Link into the Stripe dashboard (test or live, matching the secret key), e.g. stripeDashboard("payments/pi_123"). */
 export function stripeDashboard(path: string) {
   const test = /^(sk|rk)_test_/.test(process.env.STRIPE_SECRET_KEY?.trim() ?? "");
