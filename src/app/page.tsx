@@ -17,6 +17,7 @@ export default async function Home() {
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/login" className="btn btn-primary">Create an account or sign in</Link>
+          <Link href="/pricing" className="btn btn-ghost">See pricing</Link>
         </div>
       </section>
       <section aria-labelledby="how" className="bg-card border border-line rounded-3xl p-6">
@@ -24,7 +25,7 @@ export default async function Home() {
         <ol className="space-y-3 list-decimal pl-5 marker:font-bold marker:text-amber">
           <li>Choose Kroger or Meijer and fill your cart. Can&apos;t find something? Type it in and Cody will grab it. Need a few things from the other store? Add them for a small extra fee.</li>
           <li>Pick a morning or afternoon window.</li>
-          <li>Pay a flat fee based on how many different items you order, not how many of each.</li>
+          <li>Pay the store&apos;s receipt price plus a flat fee based on how many different items you order, not how many of each. <Link href="/pricing" className="underline font-bold">See pricing</Link>.</li>
         </ol>
       </section>
     </div>

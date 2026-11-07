@@ -5,6 +5,7 @@ import "@fontsource/atkinson-hyperlegible/latin-700.css";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const metadata: Metadata = {
   title: "Redbird Grocery",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CartProvider>
           <SiteHeader />
           <main className="flex-1 w-full max-w-3xl mx-auto px-4 pb-24 pt-4">{children}</main>
+          <SiteFooter />
         </CartProvider>
       </body>
     </html>

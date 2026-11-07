@@ -1,5 +1,6 @@
 "use client";
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { signIn, signUp, type AuthState } from "./actions";
 
 export function AuthForms({ next }: { next: string }) {
@@ -38,6 +39,12 @@ export function AuthForms({ next }: { next: string }) {
         {state.error && <p role="alert" className="text-danger font-bold">{state.error}</p>}
         {state.message && <p role="status" className="bg-amber-soft rounded-xl p-3">{state.message}</p>}
 
+        {mode === "up" && (
+          <p className="text-sm text-muted">
+            By creating an account you agree to the <Link href="/terms" className="underline">Terms</Link> and{" "}
+            <Link href="/privacy" className="underline">Privacy Policy</Link>, and confirm you&apos;re 18 or older.
+          </p>
+        )}
         <button className="btn btn-primary w-full" disabled={inPending || upPending}>
           {mode === "in" ? (inPending ? "Signing in…" : "Sign in") : upPending ? "Creating account…" : "Create account"}
         </button>
