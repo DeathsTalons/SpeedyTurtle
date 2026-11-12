@@ -4,7 +4,7 @@
 // so a customer can't edit their way to a cheaper order or an overbooked slot.
 import { customerContext } from "@/lib/customer";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { getAvailability, getAvailableSlots, getFeeTiers, getSettings, orderStores } from "@/lib/data";
+import { areaForHome, asapOpenFor, getAvailability, getAvailableSlots, getFeeTiers, getSettings, orderStores } from "@/lib/data";
 import { kroger } from "@/lib/kroger-server";
 import { meijer } from "@/lib/meijer-server";
 import { quoteOrder, type CartLine } from "@/lib/pricing";
@@ -118,6 +118,8 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   if (input.asap) {
     const a = await getAvailability();
     if (!a.open) return { error: "I just stopped taking same-day orders. Pick a delivery window instead." };
+    const here = await areaForHome(address.latitude != null ? { latitude: address.latitude, longitude: address.longitude } : null);
+    if (!asapOpenFor(a, here)) return { error: "Same-day delivery is only open in another area right now. Pick a delivery window instead." };
     slot = { date: localDate(new Date()), slotTemplateId: null };
   } else {
     const slots = await getAvailableSlots();

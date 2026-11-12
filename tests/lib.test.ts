@@ -382,3 +382,14 @@ test("Kroger card phone: accepts 10 digits (any formatting), drops a leading 1, 
   assert.equal(normalizeKrogerPhone(null), null);
   assert.equal(formatKrogerPhone("7655551234"), "(765) 555-1234");
 });
+
+test("Delivery areas: Greencastle store is Greencastle, everything else is Avon & Brownsburg", async () => {
+  const { storeArea, asArea } = await import("../src/lib/areas.ts");
+  assert.equal(storeArea({ area: "greencastle", name: "x" }), "greencastle");
+  assert.equal(storeArea({ name: "Kroger – Greencastle" }), "greencastle");   // before migration 0018
+  assert.equal(storeArea({ name: "Kroger – Brownsburg" }), "hendricks");
+  assert.equal(storeArea({ name: "Meijer – Avon" }), "hendricks");
+  assert.equal(storeArea(undefined), "hendricks");
+  assert.equal(asArea("greencastle"), "greencastle");
+  assert.equal(asArea("Plainfield"), null);
+});

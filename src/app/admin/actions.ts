@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { assertAdmin } from "@/lib/admin";
 import { finalCaptureCents } from "@/lib/pricing";
 import { authorizeOrder, chargeExtra, chargeFinal, refundItem, releaseHold } from "@/lib/payments";
+import { asArea } from "@/lib/areas";
 import { paymentsEnabled } from "@/lib/stripe";
 
 const clip = (s: unknown, n: number) => (typeof s === "string" ? s.trim().slice(0, n) : "");
@@ -240,11 +241,22 @@ export async function moveOrder(orderId: string, date: string, slotTemplateId: n
 
 // ───────────────────────── Available now (same-day ASAP) ─────────────────────────
 
-/** Turn same-day ASAP orders on for a number of minutes, or off (0). */
-export async function setAvailable(minutes: number) {
+/** Turn same-day ASAP orders on in one area for a number of minutes, or off (0). */
+export async function setAvailable(minutes: number, area?: string) {
   const { db } = await assertAdmin();
   const until = minutes > 0 ? new Date(Date.now() + Math.min(minutes, 12 * 60) * 60_000).toISOString() : null;
   await db.from("settings").update({ available_until: until }).eq("id", true);
+  // Separate update so turning on/off still works before migration 0018 is run.
+  const a = asArea(area);
+  if (a) await db.from("settings").update({ available_area: a }).eq("id", true);
+  revalidatePath("/admin");
+}
+
+/** Move "available now" to another area without changing when it ends. */
+export async function setAvailableArea(area: string) {
+  const { db } = await assertAdmin();
+  const a = asArea(area);
+  if (a) await db.from("settings").update({ available_area: a }).eq("id", true);
   revalidatePath("/admin");
 }
 

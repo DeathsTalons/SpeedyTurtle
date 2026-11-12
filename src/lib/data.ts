@@ -6,6 +6,7 @@ import type { FeeTier } from "@/lib/pricing";
 import type { Override, ScheduleInput, SlotTemplate } from "@/lib/schedule";
 import { addDays, availableSlots, localDate } from "@/lib/schedule";
 import type { Store, LatLng } from "@/lib/stores";
+import { asArea, storeArea, type Area } from "@/lib/areas";
 import { nearestStore, storesForOrder } from "@/lib/stores";
 import type { Chain } from "@/lib/stores";
 
@@ -20,6 +21,8 @@ export type Settings = {
   secondStoreFeeCents: number;
   meijerExtraBufferPct: number;
   availableUntil: string | null;
+  /** Area Cody is taking same-day orders in (null = everywhere). */
+  availableArea: Area | null;
   asapCapacity: number;
   /** "live" = real customers; "test" = the separate test database. */
   environment: "live" | "test";
@@ -42,18 +45,20 @@ export async function getSettings(): Promise<Settings> {
     secondStoreFeeCents: data.second_store_fee_cents ?? 0,
     meijerExtraBufferPct: data.meijer_extra_buffer_pct ?? 10,
     availableUntil: data.available_until ?? null,
+    availableArea: asArea(data.available_area),
     asapCapacity: data.asap_capacity ?? 2,
     environment: data.environment === "test" ? "test" : "live",
   };
 }
 
-export async function getStores(): Promise<(Store & { externalLocationId: string | null; address: string | null; allowSecondStore: boolean })[]> {
+export async function getStores(): Promise<(Store & { externalLocationId: string | null; address: string | null; allowSecondStore: boolean; area: Area })[]> {
   const { data, error } = await db().from("stores").select("*").eq("active", true);
   if (error) throw error;
   return data.map((s: any) => ({
     id: s.id, chain: s.chain, name: s.name, active: s.active,
     latitude: s.latitude, longitude: s.longitude,
     externalLocationId: s.external_location_id, address: s.address, allowSecondStore: s.allow_second_store ?? true,
+    area: storeArea(s),
   }));
 }
 
@@ -75,17 +80,25 @@ export async function orderStores(home: LatLng | null, primary: Chain) {
   };
 }
 
-export type Availability = { open: boolean; until: string | null; taken: number; capacity: number };
+export type Availability = { open: boolean; until: string | null; taken: number; capacity: number; area: Area | null };
 
-/** Is Cody taking same-day ASAP orders right now? */
+/** Is Cody taking same-day ASAP orders right now, and in which area? */
 export async function getAvailability(now = new Date()): Promise<Availability> {
   const s = await getSettings();
   const live = !!s.availableUntil && new Date(s.availableUntil).getTime() > now.getTime();
-  if (!live) return { open: false, until: null, taken: 0, capacity: s.asapCapacity };
+  if (!live) return { open: false, until: null, taken: 0, capacity: s.asapCapacity, area: s.availableArea };
   const { count } = await db().from("orders").select("id", { count: "exact", head: true })
     .eq("asap", true).in("status", ["placed", "shopping", "delivering"]).eq("delivery_date", localDate(now));
   const taken = count ?? 0;
-  return { open: taken < s.asapCapacity, until: s.availableUntil, taken, capacity: s.asapCapacity };
+  return { open: taken < s.asapCapacity, until: s.availableUntil, taken, capacity: s.asapCapacity, area: s.availableArea };
+}
+
+/** Can a customer in this area order ASAP right now? */
+export const asapOpenFor = (a: Availability, area: Area) => a.open && (!a.area || a.area === area);
+
+/** The delivery area of an address: the area of the Kroger store nearest it. */
+export async function areaForHome(home: LatLng | null): Promise<Area> {
+  return storeArea((await storesFor(home)).kroger);
 }
 
 export async function getScheduleInput(now = new Date()): Promise<ScheduleInput> {

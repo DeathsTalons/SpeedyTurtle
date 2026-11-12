@@ -14,8 +14,8 @@ import { placeOrder } from "./actions";
 export type SlotOption = { date: string; slotTemplateId: number; label: string; window: string; remaining: number };
 type Address = { id: string; line1: string; line2: string | null; city: string; zip: string; is_default: boolean };
 
-export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
-  paymentsOn: boolean; asapUntil: string | null; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
+export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
+  paymentsOn: boolean; asapUntil: string | null; asapAddressIds: string[]; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
   savedKrogerPhone: string | null;
 }) {
   const cart = useCart();
@@ -74,7 +74,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
     <div className="space-y-8">
       <fieldset className="space-y-3">
         <legend className="text-xl font-extrabold mb-2">Delivery window</legend>
-        {asapUntil && (
+        {asapUntil && asapAddressIds.includes(addressId) && (
           <label className={`flex gap-3 items-center cursor-pointer rounded-2xl border-2 p-3 ${slotKey === "asap" ? "border-shell bg-shell text-white" : "border-shell/50 bg-card"}`}>
             <input type="radio" name="slot" value="asap" checked={slotKey === "asap"} onChange={() => setSlotKey("asap")} className="sr-only" />
             <span className="w-3 h-3 rounded-full bg-amber animate-pulse shrink-0" aria-hidden />
@@ -103,7 +103,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
         <legend className="text-xl font-extrabold mb-2">Deliver to</legend>
         {addresses.map((a) => (
           <label key={a.id} className={`flex gap-3 items-start cursor-pointer rounded-2xl border-2 p-3 ${addressId === a.id ? "border-shell bg-card" : "border-line"}`}>
-            <input type="radio" name="address" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1.5 accent-[var(--shell)]" />
+            <input type="radio" name="address" checked={addressId === a.id} onChange={() => { setAddressId(a.id); if (slotKey === "asap" && !asapAddressIds.includes(a.id)) setSlotKey(""); }} className="mt-1.5 accent-[var(--shell)]" />
             <span><b>{a.line1}{a.line2 ? `, ${a.line2}` : ""}</b><br /><span className="text-muted">{a.city}, IN {a.zip}</span></span>
           </label>
         ))}
