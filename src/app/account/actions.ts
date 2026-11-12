@@ -1,4 +1,5 @@
 "use server";
+import { normalizeKrogerPhone } from "@/lib/kroger-card";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -15,11 +16,16 @@ async function requireUser() {
 
 export async function saveProfile(_: FormState, form: FormData): Promise<FormState> {
   const { db, user } = await requireUser();
+  const krogerRaw = String(form.get("kroger_card_phone") ?? "").trim();
+  const krogerPhone = normalizeKrogerPhone(krogerRaw);
+  if (krogerRaw && !krogerPhone) return { error: "Your Kroger card phone number should be 10 digits (or leave it blank)." };
   const { error } = await db.from("profiles").update({
     full_name: String(form.get("full_name") ?? "").trim() || null,
     phone: String(form.get("phone") ?? "").trim() || null,
   }).eq("id", user.id);
   if (error) return { error: error.message };
+  // Separate update, so saving your name still works before migration 0017 is run.
+  if (form.has("kroger_card_phone")) await db.from("profiles").update({ kroger_card_phone: krogerPhone }).eq("id", user.id);
   revalidatePath("/account");
   return { ok: "Saved." };
 }

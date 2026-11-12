@@ -370,3 +370,15 @@ test("buy-again / popular ranking: frequency first, then most recent", async () 
   assert.deepEqual(rankByOrders(rows, 10), ["milk", "eggs", "bread"]);
   assert.deepEqual(rankByOrders(rows, 2, new Set(["milk"])), ["eggs", "bread"]);
 });
+
+test("Kroger card phone: accepts 10 digits (any formatting), drops a leading 1, rejects the rest", async () => {
+  const { normalizeKrogerPhone, formatKrogerPhone } = await import("../src/lib/kroger-card.ts");
+  assert.equal(normalizeKrogerPhone("(765) 555-1234"), "7655551234");
+  assert.equal(normalizeKrogerPhone("1-765-555-1234"), "7655551234");
+  assert.equal(normalizeKrogerPhone("765.555.1234"), "7655551234");
+  assert.equal(normalizeKrogerPhone("555-1234"), null);      // too short
+  assert.equal(normalizeKrogerPhone("0655551234"), null);    // Kroger Alt IDs can't start with 0
+  assert.equal(normalizeKrogerPhone(""), null);
+  assert.equal(normalizeKrogerPhone(null), null);
+  assert.equal(formatKrogerPhone("7655551234"), "(765) 555-1234");
+});

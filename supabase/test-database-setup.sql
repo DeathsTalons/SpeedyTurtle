@@ -461,5 +461,14 @@ alter default privileges in schema public grant all on functions to anon, authen
 revoke insert, update, delete on profiles from anon, authenticated;
 grant update (full_name, phone, fees_seen_at) on profiles to authenticated;
 
+-- ════════════ 0017_kroger_card.sql ════════════
+-- Kroger card (Alt ID) phone number: customers can give the number on their Kroger card so their order is rung
+-- up with it (their clipped digital coupons apply, they get the fuel points). Blank = Cody uses his own card.
+alter table profiles add column kroger_card_phone text;  -- remembered for next time
+alter table orders add column kroger_card_phone text;    -- what to use for this order
+
+-- Customers may change their own Kroger card number too (still not role or Stripe id).
+grant update (full_name, phone, fees_seen_at, kroger_card_phone) on profiles to authenticated;
+
 -- ════════════ mark this database as TEST ════════════
 update settings set environment = 'test';

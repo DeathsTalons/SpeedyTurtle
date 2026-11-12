@@ -27,6 +27,11 @@ export function PricingDetails({ tiers, secondStoreFeeCents, bufferPct }: { tier
             goes on sale in between, the savings are yours.
           </li>
           <li>
+            <b>Your Kroger coupons and fuel points.</b> Add the phone number on your Kroger card at checkout and I&apos;ll ring up your
+            Kroger items with it, so your clipped digital coupons apply and the fuel points are yours. No card? I&apos;ll use mine so you
+            still get member prices.
+          </li>
+          <li>
             <b>Never charged for what I can&apos;t find.</b> Out-of-stock items come right off. You only pay for what&apos;s on the receipt.
           </li>
           <li>

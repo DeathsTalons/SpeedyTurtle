@@ -15,6 +15,7 @@ export default function PrivacyPage() {
       <ul>
         <li><b>Account details:</b> your name, email address, phone number and password (stored securely; I can&apos;t see it).</li>
         <li><b>Delivery addresses</b> and any delivery notes you add, like a gate code.</li>
+        <li><b>Your Kroger card number</b> (optional): the phone number on your Kroger card, if you give it. I only use it at the register to ring up your Kroger items, and you can remove it on your Account page anytime.</li>
         <li><b>Orders:</b> what you ordered, substitution choices, notes, receipt totals, tips and order history.</li>
         <li><b>Payment details:</b> your card is entered directly into Stripe, my payment processor. I never see or store your full card number. I only keep a reference to your saved card so I can charge it for your orders.</li>
       </ul>

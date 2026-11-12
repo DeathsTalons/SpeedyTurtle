@@ -1,6 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import { addAddress, saveProfile, type FormState } from "./actions";
+import { KROGER_CARD_NOTE } from "@/lib/kroger-card";
 
 function Msg({ s }: { s: FormState }) {
   if (s.error) return <p role="alert" className="text-danger font-bold">{s.error}</p>;
@@ -8,7 +9,7 @@ function Msg({ s }: { s: FormState }) {
   return null;
 }
 
-export function ProfileForm({ fullName, phone }: { fullName: string; phone: string }) {
+export function ProfileForm({ fullName, phone, krogerPhone }: { fullName: string; phone: string; krogerPhone: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(saveProfile, {});
   return (
     <form action={action} className="grid sm:grid-cols-2 gap-4">
@@ -16,6 +17,9 @@ export function ProfileForm({ fullName, phone }: { fullName: string; phone: stri
         <input className="field" id="full_name" name="full_name" defaultValue={fullName} autoComplete="name" /></div>
       <div><label className="label" htmlFor="phone">Mobile number</label>
         <input className="field" id="phone" name="phone" type="tel" defaultValue={phone} autoComplete="tel" /></div>
+      <div className="sm:col-span-2"><label className="label" htmlFor="kroger_card_phone">Kroger card phone number <span className="font-normal text-muted">(optional)</span></label>
+        <input className="field max-w-xs" id="kroger_card_phone" name="kroger_card_phone" type="tel" defaultValue={krogerPhone} autoComplete="off" />
+        <p className="text-sm text-muted mt-1">{KROGER_CARD_NOTE}</p></div>
       <div className="sm:col-span-2 flex items-center gap-4">
         <button className="btn btn-ghost" disabled={pending}>{pending ? "Saving…" : "Save details"}</button>
         <Msg s={state} />

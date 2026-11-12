@@ -7,5 +7,5 @@ export const BUSINESS = {
   phoneHref: "+17657190163",
   area: "Brownsburg, Avon, Greencastle and nearby in Indiana",
   /** Shown at the top of Terms, Privacy and Refunds. Update when you change any of them. */
-  policiesUpdated: "November 7, 2026",
+  policiesUpdated: "November 12, 2026",
 };

@@ -5,6 +5,7 @@ import { storesFor } from "@/lib/data";
 import { signOut } from "../login/actions";
 import { deleteAddress, makeDefault } from "./actions";
 import { AddressForm, ProfileForm } from "./forms";
+import { formatKrogerPhone } from "@/lib/kroger-card";
 
 export const metadata = { title: "Account · Redbird Grocery" };
 
@@ -14,7 +15,7 @@ export default async function AccountPage() {
   if (!user) redirect("/login?next=/account");
 
   const [{ data: profile }, { data: addresses }] = await Promise.all([
-    db.from("profiles").select("full_name, phone").eq("id", user.id).single(),
+    db.from("profiles").select("*").eq("id", user.id).single(),
     db.from("addresses").select("*").eq("user_id", user.id).order("created_at"),
   ]);
   const list = addresses ?? [];
@@ -58,7 +59,7 @@ export default async function AccountPage() {
       <section aria-labelledby="me-h" className="space-y-4">
         <h2 id="me-h" className="text-xl font-extrabold">Your details</h2>
         <p className="text-muted">Signed in as {user.email}</p>
-        <ProfileForm fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} />
+        <ProfileForm fullName={profile?.full_name ?? ""} phone={profile?.phone ?? ""} krogerPhone={profile?.kroger_card_phone ? formatKrogerPhone(profile.kroger_card_phone) : ""} />
       </section>
 
       <div className="flex flex-wrap gap-3">

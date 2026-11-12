@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart, money } from "@/lib/cart";
 import { OrderSummary } from "@/components/order-summary";
 import { TipNote } from "@/components/tip-note";
+import { KROGER_CARD_NOTE, formatKrogerPhone, normalizeKrogerPhone } from "@/lib/kroger-card";
 import type { FeeTier } from "@/lib/pricing";
 import { formatDate, formatTime } from "@/lib/format";
 import { placeOrder } from "./actions";
@@ -13,14 +14,17 @@ import { placeOrder } from "./actions";
 export type SlotOption = { date: string; slotTemplateId: number; label: string; window: string; remaining: number };
 type Address = { id: string; line1: string; line2: string | null; city: string; zip: string; is_default: boolean };
 
-export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents }: {
+export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
   paymentsOn: boolean; asapUntil: string | null; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
+  savedKrogerPhone: string | null;
 }) {
   const cart = useCart();
   const router = useRouter();
   const [addressId, setAddressId] = useState(addresses.find((a) => a.is_default)?.id ?? addresses[0]?.id ?? "");
   const [slotKey, setSlotKey] = useState("");
   const [notes, setNotes] = useState("");
+  const [krogerPhone, setKrogerPhone] = useState(savedKrogerPhone ? formatKrogerPhone(savedKrogerPhone) : "");
+  const [saveKrogerPhone, setSaveKrogerPhone] = useState(true);
   const [tip, setTip] = useState(500);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
@@ -39,11 +43,14 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
   if (addresses.length === 0)
     return <p className="bg-amber-soft rounded-2xl p-4"><Link href="/account" className="underline font-bold">Add a delivery address</Link> before checking out.</p>;
 
+  const hasKroger = cart.items.some((i) => i.chain === "kroger");
+
   const submit = () => {
     setError("");
     const asap = slotKey === "asap";
     const [date, id] = asap ? ["", "0"] : slotKey.split("#");
     if (!asap && !date) { setError("Pick a delivery window."); return; }
+    if (hasKroger && krogerPhone.trim() && !normalizeKrogerPhone(krogerPhone)) { setError("Check your Kroger card phone number: it should be 10 digits. Or leave it blank."); return; }
     start(async () => {
       let paymentMethodId: string | undefined;
       if (paymentsOn) {
@@ -54,6 +61,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
       const res = await placeOrder({
         paymentMethodId,
         addressId, date, slotTemplateId: Number(id), asap, notes, tipCents: tip, primaryChain: cart.primary ?? "kroger",
+        krogerCardPhone: hasKroger ? krogerPhone : "", saveKrogerCardPhone: saveKrogerPhone,
         items: cart.items.map((i) => ({ chain: i.chain, externalId: i.externalId, productId: i.productId, freeText: i.freeText, quantity: i.quantity, note: i.note, subChoice: i.subChoice ?? "codys_pick", approvedSubs: i.approvedSubs ?? [] })),
       });
       if (res.error) { setError(res.error); if (paymentMethodId) setCardKey((k) => k + 1); return; }
@@ -105,6 +113,19 @@ export function CheckoutForm({ paymentsOn, asapUntil, addresses, slots, tiers, b
         Substitution choices are set per item in your <Link href="/cart" className="underline font-bold">cart</Link>.
         {" "}{cart.items.filter((i) => (i.subChoice ?? "codys_pick") === "codys_pick").length} of {cart.items.length} items are set to &ldquo;Let me pick.&rdquo;
       </p>
+
+      {hasKroger && (
+        <div className="bg-card border border-line rounded-3xl p-5 space-y-2">
+          <label htmlFor="kroger-card" className="text-xl font-extrabold block">Your Kroger card <span className="text-base font-normal text-muted">(optional)</span></label>
+          <p className="text-sm text-muted">{KROGER_CARD_NOTE}</p>
+          <input id="kroger-card" className="field max-w-xs" type="tel" inputMode="tel" autoComplete="off" placeholder="Phone number on your Kroger card"
+            value={krogerPhone} onChange={(e) => setKrogerPhone(e.target.value)} maxLength={20} />
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={saveKrogerPhone} onChange={(e) => setSaveKrogerPhone(e.target.checked)} />
+            Remember it for next time
+          </label>
+        </div>
+      )}
 
       <div>
         <label htmlFor="notes" className="text-xl font-extrabold block mb-2">Anything I should know?</label>

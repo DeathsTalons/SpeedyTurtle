@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState, useTransition } from "react";
+import { formatKrogerPhone } from "@/lib/kroger-card";
 import { useRouter } from "next/navigation";
 import { money } from "@/lib/cart";
 import { sameUpc, sortForWalk, subLabel } from "@/lib/shopping";
@@ -104,6 +105,11 @@ export function ShoppingList({ batchId, orders, initialLines }: { batchId: strin
               <span className="w-3 h-3 rounded-full" style={{ background: o.color }} aria-hidden />
               <span className="font-bold">{o.customer}</span>
               <span className="text-sm text-muted">{mine.filter(done).length}/{mine.length}</span>
+              {o.krogerStoreId && (
+                <span className="text-xs font-bold bg-paper rounded-full px-2 py-0.5 whitespace-nowrap">
+                  Kroger card: {o.krogerCardPhone ? formatKrogerPhone(o.krogerCardPhone) : "yours"}
+                </span>
+              )}
               <details className="relative">
                 <summary className="cursor-pointer text-sm font-bold underline list-none">More</summary>
                 <div className="absolute z-30 mt-2 right-0 w-64 bg-card border border-line rounded-2xl p-3 shadow-lg space-y-2 text-sm">

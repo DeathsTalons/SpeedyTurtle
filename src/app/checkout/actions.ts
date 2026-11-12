@@ -10,6 +10,7 @@ import { meijer } from "@/lib/meijer-server";
 import { quoteOrder, type CartLine } from "@/lib/pricing";
 import { addDays, localDate, weekdayOf } from "@/lib/schedule";
 import { paymentsEnabled, stripeTestMode, HOLD_AT_CHECKOUT_WITHIN_DAYS } from "@/lib/stripe";
+import { normalizeKrogerPhone } from "@/lib/kroger-card";
 import { authorizeOrder, createCardSetup, verifyPaymentMethod } from "@/lib/payments";
 import { MAX_APPROVED_SUBS, SUB_CHOICES, type ApprovedSub, type SubChoice } from "@/lib/shopping";
 
@@ -37,6 +38,10 @@ export type CheckoutInput = {
   notes?: string;
   tipCents: number;
   items: CheckoutItem[];
+  /** Phone number on the customer's Kroger card (Alt ID). Blank = Cody uses his own card. */
+  krogerCardPhone?: string;
+  /** Remember the Kroger card number on their profile. */
+  saveKrogerCardPhone?: boolean;
 };
 
 export type CheckoutResult = { orderId?: string; error?: string };
@@ -266,6 +271,13 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   if (itemsErr) {
     await admin.from("orders").delete().eq("id", order.id);
     return { error: "Couldn't place your order. Try again." };
+  }
+
+  // Kroger card number: saved separately so an order never fails over it (e.g. before migration 0017 is run).
+  if (hasKroger) {
+    const krogerPhone = normalizeKrogerPhone(clip(input.krogerCardPhone, 20));
+    if (krogerPhone) await admin.from("orders").update({ kroger_card_phone: krogerPhone }).eq("id", order.id);
+    if (input.saveKrogerCardPhone) await ctx.db.from("profiles").update({ kroger_card_phone: krogerPhone }).eq("id", ctx.user.id);
   }
 
   // Hold the card now if delivery is soon (holds last about a week); otherwise it's placed when Cody starts shopping.

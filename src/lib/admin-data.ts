@@ -100,6 +100,8 @@ export type BatchOrder = BoardOrder & {
   color: string; customerNotes: string | null; krogerStoreId: string | null; meijerStoreId: string | null;
   serviceFeeCents: number; secondStoreFeeCents: number; tipCents: number; authorizedCents: number;
   receiptKrogerCents: number | null; receiptMeijerCents: number | null; finalTotalCents: number | null; finalizedAt: string | null;
+  /** Customer's Kroger card number for the register, or null = use Cody's. */
+  krogerCardPhone: string | null;
 };
 
 export async function loadBatch(db: any, batchId: string, colors: string[]) {
@@ -108,7 +110,9 @@ export async function loadBatch(db: any, batchId: string, colors: string[]) {
 
   const { data: orders, error } = await db
     .from("orders")
-    .select(ORDER_SELECT + ", customer_notes, kroger_store_id, meijer_store_id, authorized_amount_cents, receipt_kroger_cents, receipt_meijer_cents, final_total_cents, finalized_at, order_items(*, products(upc, image_url))")
+    // "*" for the order's own columns, so newer ones (kroger_card_phone) never break this before their migration runs.
+    .select("*, profiles(full_name, phone), addresses(city), slot_templates(label, start_time, end_time)," +
+      " kroger:stores!orders_kroger_store_id_fkey(name), meijer:stores!orders_meijer_store_id_fkey(name), order_items(*, products(upc, image_url))")
     .eq("batch_id", batchId)
     .order("delivery_date");
   if (error) throw error;
@@ -117,6 +121,7 @@ export async function loadBatch(db: any, batchId: string, colors: string[]) {
     ...toBoardOrder(o),
     color: colors[i % colors.length],
     customerNotes: o.customer_notes,
+    krogerCardPhone: o.kroger_card_phone ?? null,
     krogerStoreId: o.kroger_store_id,
     meijerStoreId: o.meijer_store_id,
     serviceFeeCents: o.service_fee_cents,

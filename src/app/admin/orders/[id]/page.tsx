@@ -9,6 +9,7 @@ import { subLabel } from "@/lib/shopping";
 import { stripeDashboard } from "@/lib/stripe";
 import { StatusPill, when } from "../../records-ui";
 import { RefundItem } from "./refund-item";
+import { formatKrogerPhone } from "@/lib/kroger-card";
 
 export const metadata = { title: "Order · Admin" };
 
@@ -75,6 +76,7 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
             </>
           ) : <p className="text-muted">No address</p>}
           <p className="pt-2"><span className="text-muted">Stores:</span> {[kroger?.name, meijer?.name].filter(Boolean).join(" + ") || "—"}</p>
+          {kroger && <p><span className="text-muted">Kroger card:</span> <b>{o.kroger_card_phone ? formatKrogerPhone(o.kroger_card_phone) : "use yours"}</b></p>}
           {o.store_reassigned_at && <p className="text-sm text-muted">Store changed by hand {formatStamp(o.store_reassigned_at)}</p>}
           {o.customer_notes && <p className="pt-2"><span className="text-muted">Customer note:</span> “{o.customer_notes}”</p>}
         </div>
