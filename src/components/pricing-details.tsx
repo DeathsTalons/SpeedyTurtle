@@ -15,6 +15,28 @@ export function PricingDetails({ tiers, secondStoreFeeCents, bufferPct }: { tier
         <p>You pay exactly what&apos;s on the Kroger or Meijer receipt. I don&apos;t mark up a single item.</p>
       </section>
 
+      <section className="bg-card border border-line rounded-3xl p-5 space-y-3" aria-labelledby="save-h">
+        <h2 id="save-h" className="text-xl font-extrabold">Ways I save you money</h2>
+        <ul className="space-y-3">
+          <li>
+            <b>Sale-size swaps.</b> If a deal gets you the same amount for less, I&apos;ll take it. Say you order a 16 oz block of cheese
+            for $5, but the 8 oz is on sale 2 for $4. I&apos;ll grab two 8 oz blocks and you save $1. It still counts as one item for your fee.
+          </li>
+          <li>
+            <b>You get the sale price.</b> Prices while you shop are estimates. You pay the shelf price on the day I shop, so if something
+            goes on sale in between, the savings are yours.
+          </li>
+          <li>
+            <b>Never charged for what I can&apos;t find.</b> Out-of-stock items come right off. You only pay for what&apos;s on the receipt.
+          </li>
+          <li>
+            <b>Store brand when you&apos;re open to it.</b> Choose &ldquo;Store brand is OK&rdquo; as the backup on any item and I&apos;ll
+            grab the Kroger or Meijer version if yours is out.
+          </li>
+        </ul>
+        <p className="text-sm text-muted">Want exactly what you picked, no swaps? Add a note to that item in your cart and I&apos;ll stick to it.</p>
+      </section>
+
       <section className="bg-card border border-line rounded-3xl p-5 space-y-3" aria-labelledby="fee-h">
         <h2 id="fee-h" className="text-xl font-extrabold">One flat service fee per order</h2>
         <p>The fee depends on how many <b>different</b> items you order, not how many of each. Six bananas and two gallons of milk count as 2 items.</p>
