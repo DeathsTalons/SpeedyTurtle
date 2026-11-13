@@ -9,6 +9,10 @@ import { subLabel } from "@/lib/shopping";
 import { stripeDashboard } from "@/lib/stripe";
 import { StatusPill, when } from "../../records-ui";
 import { RefundItem } from "./refund-item";
+import { EmailReceiptButton } from "./email-receipt";
+import { ReceiptPhotoStrip } from "@/components/receipt-photo-strip";
+import { photosOf, signedPhotos } from "@/lib/receipt-photos";
+import { receiptEmailEnabled } from "@/lib/receipt-email";
 import { formatKrogerPhone } from "@/lib/kroger-card";
 
 export const metadata = { title: "Order · Admin" };
@@ -96,6 +100,13 @@ export default async function AdminOrderPage({ params }: PageProps<"/admin/order
           <Row label="You made (fees + tips)" value={<b className="text-shell">{m.final && o.status !== "canceled" ? money(m.earned) : "—"}</b>} />
         </div>
       </section>
+
+      <ReceiptPhotoStrip photos={await signedPhotos(photosOf(o))} title="Receipt photos" />
+      {m.final && (
+        <div className="flex flex-wrap items-center gap-3">
+          <EmailReceiptButton orderId={o.id} sentAt={o.receipt_emailed_at ? formatStamp(o.receipt_emailed_at) : null} enabled={receiptEmailEnabled()} />
+        </div>
+      )}
 
       <section className="bg-card border border-line rounded-3xl p-5 space-y-1.5">
         <h2 className="text-xl font-extrabold mb-1">Card</h2>

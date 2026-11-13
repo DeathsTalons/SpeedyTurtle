@@ -7,6 +7,8 @@ import { STATUS } from "@/lib/order-status";
 import { subLabel } from "@/lib/shopping";
 import { paymentsEnabled } from "@/lib/stripe";
 import { TipAfter } from "./tip-after";
+import { ReceiptPhotoStrip } from "@/components/receipt-photo-strip";
+import { photosOf, signedPhotos } from "@/lib/receipt-photos";
 import { CancelOrder } from "./cancel-order";
 
 export const metadata = { title: "Order · Redbird Grocery" };
@@ -105,6 +107,8 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/or
           </div>
         )}
       </section>
+
+      <ReceiptPhotoStrip photos={await signedPhotos(photosOf(o))} />
 
       {o.status === "delivered" && !(o.later_tip_cents > 0) && (!paymentsEnabled() || o.stripe_payment_method_id) && <TipAfter orderId={o.id} />}
 

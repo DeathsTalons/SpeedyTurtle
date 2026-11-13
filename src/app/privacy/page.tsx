@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <li><b>Account details:</b> your name, email address, phone number and password (stored securely; I can&apos;t see it).</li>
         <li><b>Delivery addresses</b> and any delivery notes you add, like a gate code.</li>
         <li><b>Your Kroger card number</b> (optional): the phone number on your Kroger card, if you give it. I only use it at the register to ring up your Kroger items, and you can remove it on your Account page anytime.</li>
-        <li><b>Orders:</b> what you ordered, substitution choices, notes, receipt totals, tips and order history.</li>
+        <li><b>Orders:</b> what you ordered, substitution choices, notes, receipt totals and photos of your store receipts, tips and order history.</li>
         <li><b>Payment details:</b> your card is entered directly into Stripe, my payment processor. I never see or store your full card number. I only keep a reference to your saved card so I can charge it for your orders.</li>
       </ul>
 
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
         <li><b>Stripe</b> processes payments and stores your card.</li>
         <li><b>Supabase</b> hosts my database and handles sign-in.</li>
         <li><b>Vercel</b> hosts this website.</li>
-        <li><b>Resend</b> sends account emails, like your sign-up confirmation.</li>
+        <li><b>Resend</b> sends your emails, like your sign-up confirmation and order receipts.</li>
         <li><b>The U.S. Census Bureau&apos;s address lookup</b> turns your address into map coordinates so I can pick your nearest stores.</li>
         <li><b>Kroger</b> provides product and price information. I don&apos;t send them your personal information.</li>
       </ul>

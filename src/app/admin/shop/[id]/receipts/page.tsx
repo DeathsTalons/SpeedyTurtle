@@ -4,6 +4,8 @@ import { requireAdmin } from "@/lib/admin";
 import { loadBatch } from "@/lib/admin-data";
 import { CUSTOMER_COLORS, suggestedSubtotal } from "@/lib/shopping";
 import { Receipts } from "./receipts";
+import { signedPhotos } from "@/lib/receipt-photos";
+import { receiptEmailEnabled } from "@/lib/receipt-email";
 
 export default async function ReceiptsPage({ params }: PageProps<"/admin/shop/[id]/receipts">) {
   const { id } = await params;
@@ -17,14 +19,18 @@ export default async function ReceiptsPage({ params }: PageProps<"/admin/shop/[i
       meijer: o.meijerStoreId ? suggestedSubtotal(mine.filter((l) => l.chain === "meijer")) : null,
     }];
   }));
+  const photos = Object.fromEntries(await Promise.all(data.orders.map(async (o) => [o.id, await signedPhotos(o.receiptPhotos)] as const)));
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <div className="flex items-center gap-3">
         <h1 className="text-3xl font-extrabold mr-auto">Receipt totals</h1>
         <Link href={`/admin/shop/${id}`} className="underline font-bold">Back to list</Link>
       </div>
-      <p className="text-muted">Enter what each store&apos;s receipt came to for each customer. The app adds your fees and tip.</p>
-      <Receipts orders={data.orders} suggest={suggest} />
+      <p className="text-muted">
+        For each customer: snap the store receipt, enter what it came to, and save to charge their card. When you mark it delivered,
+        they get their receipt by email with the photos attached.
+      </p>
+      <Receipts orders={data.orders} suggest={suggest} photos={photos} emailOn={receiptEmailEnabled()} />
     </div>
   );
 }

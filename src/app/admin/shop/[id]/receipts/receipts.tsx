@@ -3,22 +3,29 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { money } from "@/lib/money";
 import type { BatchOrder } from "@/lib/admin-data";
-import { chargeOverHold, saveReceipts, setOrderStatus } from "../../../actions";
+import { chargeOverHold, emailReceipt, saveReceipts, setOrderStatus } from "../../../actions";
+import { ReceiptPhotos, type PhotoView } from "./receipt-photos";
 
 type Suggest = { kroger: { cents: number; unpriced: number } | null; meijer: { cents: number; unpriced: number } | null };
 const toInput = (c: number | null | undefined) => (c == null ? "" : (c / 100).toFixed(2));
 const parse = (v: string) => { const n = Number(v.replace(/[$,\s]/g, "")); return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null; };
 
-export function Receipts({ orders, suggest }: { orders: BatchOrder[]; suggest: Record<string, Suggest> }) {
+export function Receipts({ orders, suggest, photos, emailOn }: { orders: BatchOrder[]; suggest: Record<string, Suggest>; photos: Record<string, PhotoView[]>; emailOn: boolean }) {
   return (
     <div className="space-y-4">
-      {orders.map((o) => <OrderReceipt key={o.id} o={o} s={suggest[o.id]} />)}
+      {!emailOn && (
+        <p className="bg-amber-soft rounded-2xl p-3 text-sm">
+          Receipt emails are off until <b>RESEND_API_KEY</b> is added in Vercel. Photos still save and show on the customer&apos;s order page.
+        </p>
+      )}
+      {orders.map((o) => <OrderReceipt key={o.id} o={o} s={suggest[o.id]} photos={photos[o.id] ?? []} emailOn={emailOn} />)}
       <Link href="/admin" className="btn btn-ghost">Back to orders</Link>
     </div>
   );
 }
 
-function OrderReceipt({ o, s }: { o: BatchOrder; s: Suggest }) {
+function OrderReceipt({ o, s, photos, emailOn }: { o: BatchOrder; s: Suggest; photos: PhotoView[]; emailOn: boolean }) {
+  const [emailed, setEmailed] = useState<string | null>(o.receiptEmailedAt ? "sent" : null);
   const [k, setK] = useState(toInput(o.receiptKrogerCents));
   const [m, setM] = useState(toInput(o.receiptMeijerCents));
   type Saved = { totalCents: number; overAuthorizationCents: number; chargedCents?: number; note?: string; paymentsOn?: boolean };
@@ -56,6 +63,8 @@ function OrderReceipt({ o, s }: { o: BatchOrder; s: Suggest }) {
         <h2 className="text-xl font-extrabold flex-1">{o.customer}</h2>
         {saved && <span className="text-sm font-bold bg-shell text-white px-3 py-1 rounded-full">Saved</span>}
       </div>
+      <ReceiptPhotos orderId={o.id} initial={photos}
+        chains={[...(o.krogerStoreId ? ["kroger" as const] : []), ...(o.meijerStoreId ? ["meijer" as const] : [])]} />
       <div className="grid sm:grid-cols-2 gap-3">
         {o.krogerStoreId && field("Kroger", k, setK, s.kroger)}
         {o.meijerStoreId && field("Meijer", m, setM, s.meijer)}
@@ -94,10 +103,23 @@ function OrderReceipt({ o, s }: { o: BatchOrder; s: Suggest }) {
           try { setSaved(await saveReceipts(o.id, { kroger: k, meijer: m })); } catch (e) { setError((e as Error).message); }
         })}>{saved ? "Update total" : "Save total & charge"}</button>
         {saved && !delivered && (
-          <button className="btn btn-ghost" disabled={pending} onClick={() => start(async () => { await setOrderStatus(o.id, "delivered"); setDelivered(true); })}>Mark delivered</button>
+          <button className="btn btn-ghost" disabled={pending} onClick={() => start(async () => {
+            const r = await setOrderStatus(o.id, "delivered");
+            setDelivered(true);
+            if (r.emailedTo) setEmailed(r.emailedTo);
+            if (r.emailError) setError(`Delivered, but the receipt email didn't send: ${r.emailError}`);
+          })}>Mark delivered{emailOn && !emailed ? " & email receipt" : ""}</button>
         )}
         {delivered && <span className="self-center font-bold text-shell">Delivered ✓</span>}
+        {saved && emailOn && (
+          <button className="btn btn-ghost" disabled={pending} onClick={() => start(async () => {
+            setError("");
+            const r = await emailReceipt(o.id);
+            if (r.error) setError(r.error); else setEmailed(r.to ?? "sent");
+          })}>{emailed ? "Email receipt again" : "Email receipt now"}</button>
+        )}
       </div>
+      {emailed && <p className="text-sm font-bold text-shell" role="status">Receipt emailed{emailed !== "sent" ? ` to ${emailed}` : ""} ✓</p>}
       {o.paymentStatus === "none" && <p className="text-xs text-muted">This order was placed without a card (test mode), so saving sets the total but doesn&apos;t charge anything.</p>}
     </section>
   );

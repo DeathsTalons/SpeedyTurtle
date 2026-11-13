@@ -2,6 +2,9 @@
 // Everything Cody can change from the admin screens. Each action re-checks that it's Cody.
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { addReceiptPhoto, photosOf, removeReceiptPhoto, signedPhotos, type ReceiptPhotoView } from "@/lib/receipt-photos";
+import { receiptEmailEnabled, sendReceiptEmail } from "@/lib/receipt-email";
 import { assertAdmin } from "@/lib/admin";
 import { finalCaptureCents } from "@/lib/pricing";
 import { authorizeOrder, chargeExtra, chargeFinal, refundItem, releaseHold } from "@/lib/payments";
@@ -112,11 +115,63 @@ export async function refundOrderItem(orderId: string, itemId: string, amount: s
   return { ok: true };
 }
 
-export async function setOrderStatus(orderId: string, status: "placed" | "shopping" | "delivering" | "delivered" | "canceled") {
+export async function setOrderStatus(orderId: string, status: "placed" | "shopping" | "delivering" | "delivered" | "canceled"): Promise<{ emailedTo?: string; emailError?: string }> {
   const { db } = await assertAdmin();
   if (status === "canceled") await releaseHold(orderId);
   await db.from("orders").update({ status, updated_at: new Date().toISOString() }).eq("id", orderId);
   revalidatePath("/admin");
+  // Delivered + charged + not emailed yet → send the receipt (with any receipt photos) now.
+  if (status === "delivered") {
+    const { data: o } = await db.from("orders").select("*").eq("id", orderId).single();
+    if (o && o.final_total_cents != null && !o.receipt_emailed_at && receiptEmailEnabled()) {
+      const r = await sendReceiptEmail(orderId, await siteUrl());
+      return r.ok ? { emailedTo: r.to } : { emailError: r.error };
+    }
+  }
+  return {};
+}
+
+// ───────────────────────── Receipt photos & email ─────────────────────────
+
+/** This site's address, for links in emails (e.g. https://redbirdgrocery.com). */
+async function siteUrl() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "redbirdgrocery.com";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  return `${proto}://${host}`;
+}
+
+/** Add a photo of a paper receipt to an order (the phone resizes it first). */
+export async function uploadReceiptPhoto(form: FormData): Promise<{ photos?: ReceiptPhotoView[]; error?: string }> {
+  const { db } = await assertAdmin();
+  const orderId = clip(form.get("orderId"), 40);
+  const chainIn = form.get("chain");
+  const chain = chainIn === "kroger" || chainIn === "meijer" ? chainIn : null;
+  const file = form.get("photo");
+  if (!orderId || !(file instanceof File) || file.size === 0) return { error: "Pick a photo first." };
+  if (file.size > 8 * 1024 * 1024) return { error: "That photo is too big (over 8 MB)." };
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return { error: "Use a JPG or PNG photo." };
+  try { await addReceiptPhoto(orderId, file, chain); }
+  catch (e) { return { error: (e as Error).message }; }
+  const { data: o } = await db.from("orders").select("*").eq("id", orderId).single();
+  revalidatePath(`/admin/orders/${orderId}`);
+  return { photos: await signedPhotos(photosOf(o)) };
+}
+
+export async function deleteReceiptPhoto(orderId: string, path: string): Promise<{ photos: ReceiptPhotoView[] }> {
+  const { db } = await assertAdmin();
+  await removeReceiptPhoto(clip(orderId, 40), clip(path, 200));
+  const { data: o } = await db.from("orders").select("*").eq("id", orderId).single();
+  revalidatePath(`/admin/orders/${orderId}`);
+  return { photos: await signedPhotos(photosOf(o)) };
+}
+
+/** Email (or re-email) the customer their receipt. */
+export async function emailReceipt(orderId: string): Promise<{ to?: string; error?: string }> {
+  await assertAdmin();
+  const r = await sendReceiptEmail(clip(orderId, 40), await siteUrl());
+  revalidatePath(`/admin/orders/${orderId}`);
+  return r.ok ? { to: r.to } : { error: r.error };
 }
 
 // ───────────────────────── Items while shopping ─────────────────────────

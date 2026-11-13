@@ -55,10 +55,10 @@ export function Board({ orders, today, openTrips }: { orders: BoardOrder[]; toda
                       {o.batchId && (o.status === "delivering" || o.status === "shopping") && <Link href={`/admin/shop/${o.batchId}/receipts`} className="underline">Receipt total</Link>}
                       {(o.status === "placed" || o.status === "shopping") && (
                         <button className="underline text-danger" disabled={pending}
-                          onClick={() => { if (window.confirm(`Cancel ${o.customer}'s order? Any card hold is released.`)) start(() => setOrderStatus(o.id, "canceled")); }}>Cancel</button>
+                          onClick={() => { if (window.confirm(`Cancel ${o.customer}'s order? Any card hold is released.`)) start(async () => { await setOrderStatus(o.id, "canceled"); }); }}>Cancel</button>
                       )}
                       {o.status === "delivering" && (
-                        <button className="underline text-shell" disabled={pending} onClick={() => start(() => setOrderStatus(o.id, "delivered"))}>Mark delivered</button>
+                        <button className="underline text-shell" disabled={pending} onClick={() => start(async () => { const r = await setOrderStatus(o.id, "delivered"); if (r.emailError) window.alert(`Marked delivered, but the receipt email didn't send: ${r.emailError}`); })}>Mark delivered</button>
                       )}
                       {o.phone && <a className="underline" href={`sms:${o.phone}`}>Text</a>}
                       <Link href={`/admin/orders/${o.id}`} className="underline">Details</Link>

@@ -102,6 +102,8 @@ export type BatchOrder = BoardOrder & {
   receiptKrogerCents: number | null; receiptMeijerCents: number | null; finalTotalCents: number | null; finalizedAt: string | null;
   /** Customer's Kroger card number for the register, or null = use Cody's. */
   krogerCardPhone: string | null;
+  receiptPhotos: { path: string; chain: "kroger" | "meijer" | null; at: string }[];
+  receiptEmailedAt: string | null;
 };
 
 export async function loadBatch(db: any, batchId: string, colors: string[]) {
@@ -122,6 +124,8 @@ export async function loadBatch(db: any, batchId: string, colors: string[]) {
     color: colors[i % colors.length],
     customerNotes: o.customer_notes,
     krogerCardPhone: o.kroger_card_phone ?? null,
+    receiptPhotos: Array.isArray(o.receipt_photos) ? o.receipt_photos : [],
+    receiptEmailedAt: o.receipt_emailed_at ?? null,
     krogerStoreId: o.kroger_store_id,
     meijerStoreId: o.meijer_store_id,
     serviceFeeCents: o.service_fee_cents,
