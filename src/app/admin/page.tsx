@@ -4,6 +4,8 @@ import { addDays, localDate } from "@/lib/schedule";
 import { Board } from "./board";
 import { AvailabilityToggle } from "./availability";
 import { getAvailability } from "@/lib/data";
+import { OrderAlerts } from "./notifications";
+import { newVapidKeys, pushEnabled, subscriptionCount, vapidPublicKey } from "@/lib/push";
 
 export default async function AdminHome() {
   const { db } = await requireAdmin();
@@ -17,6 +19,8 @@ export default async function AdminHome() {
   return (
     <>
       <AvailabilityToggle a={await getAvailability()} />
+      <OrderAlerts publicKey={pushEnabled() ? vapidPublicKey() : null} newKeys={pushEnabled() ? null : newVapidKeys()}
+        devices={pushEnabled() ? await subscriptionCount().catch(() => 0) : 0} />
       <h1 className="text-3xl font-extrabold mb-1">Orders</h1>
       <p className="text-muted mb-5">Check the orders you want to shop together, then tap Shop.</p>
       <Board orders={orders} today={today} openTrips={openTrips} />

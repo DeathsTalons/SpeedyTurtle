@@ -92,7 +92,8 @@ export function availableSlots(input: ScheduleInput): AvailableSlot[] {
   const templates = input.templates.filter((t) => t.active !== false);
   const out: AvailableSlot[] = [];
 
-  for (let i = 0; i <= input.daysAhead; i++) {
+  // Windows start tomorrow: same-day orders only come in through "Available now", when Cody is out.
+  for (let i = 1; i <= input.daysAhead; i++) {
     const date = addDays(today, i);
     for (const t of templates) {
       if (!isSlotOpen(date, t.id, input)) continue;

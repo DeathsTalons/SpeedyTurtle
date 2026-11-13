@@ -92,11 +92,14 @@ test("toggle a whole day off, one window off, and an off-day on", () => {
   assert.ok(keys.includes("2026-10-19#1") && keys.includes("2026-10-19#2"));
 });
 
-test("full windows and windows inside the cutoff disappear", () => {
-  const now = new Date("2026-10-14T13:30:00Z"); // Wed 9:30am local → morning (10am) is inside 3h cutoff
+test("no same-day windows, full windows disappear, and the cutoff applies to tomorrow", () => {
+  const now = new Date("2026-10-14T13:30:00Z"); // Wed 9:30am local: today's windows never show
   const slots = availableSlots({ ...base, now, daysAhead: 1, bookings: [{ date: "2026-10-15", slotTemplateId: 1, count: 5 }] });
-  const keys = slots.map((s) => `${s.date}#${s.slotTemplateId}`);
-  assert.deepEqual(keys, ["2026-10-14#2", "2026-10-15#2"]);
+  assert.deepEqual(slots.map((s) => `${s.date}#${s.slotTemplateId}`), ["2026-10-15#2"]);
+  const late = new Date("2026-10-15T05:00:00Z"); // Thu 1:00am local: Thursday is now today
+  assert.ok(!availableSlots({ ...base, now: late, daysAhead: 1 }).some((s) => s.date === "2026-10-15"));
+  const night = new Date("2026-10-15T03:30:00Z"); // Wed 11:30pm local → Thu 10am is 10.5h away, still bookable
+  assert.ok(availableSlots({ ...base, now: night, daysAhead: 1 }).some((s) => s.date === "2026-10-15" && s.slotTemplateId === 1));
 });
 
 test("daylight saving handled (EDT vs EST)", () => {

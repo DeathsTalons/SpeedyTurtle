@@ -10,6 +10,7 @@ import { finalCaptureCents } from "@/lib/pricing";
 import { authorizeOrder, chargeExtra, chargeFinal, refundItem, releaseHold } from "@/lib/payments";
 import { asArea } from "@/lib/areas";
 import { paymentsEnabled } from "@/lib/stripe";
+import { deleteSubscription, notifyAdmins, pushEnabled, saveSubscription } from "@/lib/push";
 
 const clip = (s: unknown, n: number) => (typeof s === "string" ? s.trim().slice(0, n) : "");
 const cents = (v: unknown) => {
@@ -329,4 +330,28 @@ export async function setAsapCapacity(n: number) {
   const { db } = await assertAdmin();
   await db.from("settings").update({ asap_capacity: Math.max(1, Math.min(Math.round(n), 10)) }).eq("id", true);
   revalidatePath("/admin");
+}
+
+// ───────────────────────── Phone notifications ─────────────────────────
+
+/** Turn order alerts on for the device Cody is holding. */
+export async function savePushSubscription(sub: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }): Promise<{ ok?: true; error?: string }> {
+  const { user } = await assertAdmin();
+  const endpoint = clip(sub?.endpoint, 1000), p256dh = clip(sub?.keys?.p256dh, 200), auth = clip(sub?.keys?.auth, 100);
+  if (!/^https:\/\//.test(endpoint) || !p256dh || !auth) return { error: "This browser sent a bad subscription. Try again." };
+  try { await saveSubscription(user.id, { endpoint, keys: { p256dh, auth } }, (await headers()).get("user-agent")); }
+  catch (e) { return { error: (e as Error).message }; }
+  return { ok: true };
+}
+
+export async function removePushSubscription(endpoint: string) {
+  await assertAdmin();
+  await deleteSubscription(clip(endpoint, 1000));
+}
+
+export async function sendTestPush(): Promise<{ sent: number; error?: string }> {
+  await assertAdmin();
+  if (!pushEnabled()) return { sent: 0, error: "Add the two VAPID keys in Vercel first." };
+  const r = await notifyAdmins({ title: "Redbird Grocery", body: "Test alert: notifications are working! 🐦", url: "/admin" });
+  return r.sent ? { sent: r.sent } : { sent: 0, error: "Nothing was delivered. Turn alerts off and on again on this device." };
 }

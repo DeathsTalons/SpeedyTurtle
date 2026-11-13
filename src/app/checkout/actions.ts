@@ -12,6 +12,8 @@ import { addDays, localDate, weekdayOf } from "@/lib/schedule";
 import { paymentsEnabled, stripeTestMode, HOLD_AT_CHECKOUT_WITHIN_DAYS } from "@/lib/stripe";
 import { normalizeKrogerPhone } from "@/lib/kroger-card";
 import { authorizeOrder, createCardSetup, verifyPaymentMethod } from "@/lib/payments";
+import { after } from "next/server";
+import { alertForOrder } from "@/lib/push";
 import { MAX_APPROVED_SUBS, SUB_CHOICES, type ApprovedSub, type SubChoice } from "@/lib/shopping";
 
 export type CheckoutItem = {
@@ -293,5 +295,6 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
       }
     }
   }
+  after(() => alertForOrder(order.id, "new"));   // ping Cody's phone once the customer has their confirmation
   return { orderId: order.id };
 }

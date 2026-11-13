@@ -1,5 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { alertForOrder } from "@/lib/push";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { chargeLaterTip, releaseHold } from "@/lib/payments";
@@ -21,6 +23,7 @@ export async function addTipAfterDelivery(orderId: string, cents: number): Promi
 
   const r = await chargeLaterTip(o.id, amount);
   if (!r.ok) return { error: r.error };
+  after(() => alertForOrder(o.id, "tip", amount));
   revalidatePath(`/orders/${o.id}`);
   revalidatePath("/orders");
   return { ok: true };
@@ -46,6 +49,7 @@ export async function cancelMyOrder(orderId: string): Promise<{ ok?: true; error
     .eq("id", o.id).eq("status", "placed").select("id");
   if (!changed?.length) return { error: "I just started shopping this order, so it can't be canceled. Text me if something's wrong." };
   await releaseHold(o.id);
+  after(() => alertForOrder(o.id, "canceled"));
   revalidatePath(`/orders/${o.id}`);
   revalidatePath("/orders");
   revalidatePath("/admin");
