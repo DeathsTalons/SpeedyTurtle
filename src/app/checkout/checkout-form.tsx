@@ -25,7 +25,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses,
   const [notes, setNotes] = useState("");
   const [krogerPhone, setKrogerPhone] = useState(savedKrogerPhone ? formatKrogerPhone(savedKrogerPhone) : "");
   const [saveKrogerPhone, setSaveKrogerPhone] = useState(true);
-  const [tip, setTip] = useState(500);
+  const [tip, setTip] = useState(0);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
   const card = useRef<CardHandle>(null);
