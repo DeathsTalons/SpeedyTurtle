@@ -20,6 +20,9 @@ export default async function Home() {
           <Link href="/login" className="btn btn-primary">Create an account or sign in</Link>
           <Link href="/pricing" className="btn btn-ghost">See pricing</Link>
         </div>
+        <p className="text-sm text-muted">
+          1,200+ grocery orders shopped. Locally owned. <Link href="/about" className="underline font-bold">About me</Link>
+        </p>
       </section>
       <section aria-labelledby="how" className="bg-card border border-line rounded-3xl p-6">
         <h2 id="how" className="text-2xl font-extrabold mb-4">How it works</h2>

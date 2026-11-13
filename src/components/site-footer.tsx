@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { BUSINESS } from "@/lib/business";
 
 const LINKS = [
+  { href: "/about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
   { href: "/refunds", label: "Cancellations & Refunds" },
