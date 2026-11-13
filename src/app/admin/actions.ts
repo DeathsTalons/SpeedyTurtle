@@ -68,7 +68,7 @@ export async function finishBatch(batchId: string) {
 }
 
 /** Save what each store's receipt came to for one order, and work out the final total. */
-export async function saveReceipts(orderId: string, receipts: { kroger?: string; meijer?: string }) {
+export async function saveReceipts(orderId: string, receipts: { kroger?: string; meijer?: string; serviceFee?: string; secondStoreFee?: string }) {
   const { db } = await assertAdmin();
   const { data: o, error } = await db.from("orders")
     .select("kroger_store_id, meijer_store_id, service_fee_cents, second_store_fee_cents, tip_cents, authorized_amount_cents")
@@ -78,6 +78,15 @@ export async function saveReceipts(orderId: string, receipts: { kroger?: string;
   const m = o.meijer_store_id ? cents(receipts.meijer) : null;
   if ((o.kroger_store_id && k === null) || (o.meijer_store_id && m === null)) throw new Error("Enter each store's receipt total.");
   const subtotal = (k ?? 0) + (m ?? 0);
+  // Optional fee overrides ($0 allowed, e.g. a test order or a waived fee).
+  const fee = (v: string | undefined, current: number) => {
+    if (v == null || v.trim() === "") return current;
+    const n = Number(v.replace(/[$,\s]/g, ""));
+    if (!Number.isFinite(n) || n < 0 || n > 500) throw new Error("Enter a fee between $0 and $500.");
+    return Math.round(n * 100);
+  };
+  o.service_fee_cents = fee(receipts.serviceFee, o.service_fee_cents);
+  if (o.second_store_fee_cents) o.second_store_fee_cents = fee(receipts.secondStoreFee, o.second_store_fee_cents);
   const { captureCents, overAuthorizationCents } = finalCaptureCents({
     receiptSubtotalCents: subtotal, serviceFeeCents: o.service_fee_cents, secondStoreFeeCents: o.second_store_fee_cents ?? 0,
     tipCents: o.tip_cents, authorizedCents: o.authorized_amount_cents,
@@ -85,6 +94,7 @@ export async function saveReceipts(orderId: string, receipts: { kroger?: string;
   const totalCents = captureCents + overAuthorizationCents;
   await db.from("orders").update({
     receipt_kroger_cents: k, receipt_meijer_cents: m, final_subtotal_cents: subtotal,
+    service_fee_cents: o.service_fee_cents, second_store_fee_cents: o.second_store_fee_cents,
     final_total_cents: totalCents, finalized_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   }).eq("id", orderId);
   // Charge the card: capture the hold up to its amount (refund if lowered after charging).
@@ -92,7 +102,7 @@ export async function saveReceipts(orderId: string, receipts: { kroger?: string;
   try { charge = await chargeFinal(orderId, totalCents); }
   catch (e) { charge = { chargedCents: 0, overCents: totalCents, note: `Charge failed: ${(e as Error).message}` }; }
   revalidatePath("/admin");
-  return { totalCents, captureCents, overAuthorizationCents: charge.overCents, chargedCents: charge.chargedCents, note: charge.note, paymentsOn: paymentsEnabled() };
+  return { totalCents, serviceFeeCents: o.service_fee_cents as number, secondStoreFeeCents: (o.second_store_fee_cents ?? 0) as number, captureCents, overAuthorizationCents: charge.overCents, chargedCents: charge.chargedCents, note: charge.note, paymentsOn: paymentsEnabled() };
 }
 
 /** Charge the part of the total above the hold (after the customer OKs it). */

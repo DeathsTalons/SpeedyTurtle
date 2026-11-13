@@ -9,6 +9,7 @@ import { ReceiptPhotos, type PhotoView } from "./receipt-photos";
 type Suggest = { kroger: { cents: number; unpriced: number } | null; meijer: { cents: number; unpriced: number } | null };
 const toInput = (c: number | null | undefined) => (c == null ? "" : (c / 100).toFixed(2));
 const parse = (v: string) => { const n = Number(v.replace(/[$,\s]/g, "")); return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null; };
+const parseFee = (v: string) => { const n = Number(v.replace(/[$,\s]/g, "")); return v.trim() !== "" && Number.isFinite(n) && n >= 0 ? Math.round(n * 100) : null; };
 
 export function Receipts({ orders, suggest, photos, emailOn }: { orders: BatchOrder[]; suggest: Record<string, Suggest>; photos: Record<string, PhotoView[]>; emailOn: boolean }) {
   return (
@@ -28,6 +29,9 @@ function OrderReceipt({ o, s, photos, emailOn }: { o: BatchOrder; s: Suggest; ph
   const [emailed, setEmailed] = useState<string | null>(o.receiptEmailedAt ? "sent" : null);
   const [k, setK] = useState(toInput(o.receiptKrogerCents));
   const [m, setM] = useState(toInput(o.receiptMeijerCents));
+  const [editFees, setEditFees] = useState(false);
+  const [fee, setFee] = useState(toInput(o.serviceFeeCents));
+  const [fee2, setFee2] = useState(toInput(o.secondStoreFeeCents));
   type Saved = { totalCents: number; overAuthorizationCents: number; chargedCents?: number; note?: string; paymentsOn?: boolean };
   const [saved, setSaved] = useState<Saved | null>(
     o.finalTotalCents != null ? { totalCents: o.finalTotalCents, overAuthorizationCents: Math.max(0, o.finalTotalCents - o.authorizedCents) } : null);
@@ -36,7 +40,9 @@ function OrderReceipt({ o, s, photos, emailOn }: { o: BatchOrder; s: Suggest; ph
   const [delivered, setDelivered] = useState(o.status === "delivered");
   const [pending, start] = useTransition();
 
-  const fees = o.serviceFeeCents + o.secondStoreFeeCents + o.tipCents;
+  const feeCents = parseFee(fee) ?? o.serviceFeeCents;
+  const fee2Cents = o.secondStoreFeeCents ? parseFee(fee2) ?? o.secondStoreFeeCents : 0;
+  const fees = feeCents + fee2Cents + o.tipCents;
   const subtotal = (o.krogerStoreId ? parse(k) ?? 0 : 0) + (o.meijerStoreId ? parse(m) ?? 0 : 0);
   const preview = subtotal + fees;
   const over = preview - o.authorizedCents;
@@ -71,7 +77,22 @@ function OrderReceipt({ o, s, photos, emailOn }: { o: BatchOrder; s: Suggest; ph
       </div>
       <dl className="text-sm grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
         <dt>Groceries</dt><dd>{money(subtotal)}</dd>
-        <dt>Service fee{o.secondStoreFeeCents ? " + second store" : ""}</dt><dd>{money(o.serviceFeeCents + o.secondStoreFeeCents)}</dd>
+        <dt>
+          Service fee{o.secondStoreFeeCents ? " + second store" : ""}
+          {" "}<button type="button" className="underline text-muted" onClick={() => setEditFees(!editFees)}>{editFees ? "done" : "adjust"}</button>
+        </dt><dd>{money(feeCents + fee2Cents)}</dd>
+        {editFees && (
+          <dd className="col-span-2 bg-paper rounded-2xl p-3 space-y-2">
+            {[["Service fee", fee, setFee] as const, ...(o.secondStoreFeeCents ? [["Second store fee", fee2, setFee2] as const] : [])].map(([label, v, set]) => (
+              <label key={label} className="flex items-center gap-2">
+                <span className="flex-1">{label}</span>
+                <span className="font-bold">$</span>
+                <input className="field !w-28" inputMode="decimal" value={v} onChange={(e) => set(e.target.value)} placeholder="0.00" />
+              </label>
+            ))}
+            <p className="text-xs text-muted">Set to 0 to waive it. The new fee shows on their receipt and order page.</p>
+          </dd>
+        )}
         {o.tipCents > 0 && <><dt>Tip</dt><dd>{money(o.tipCents)}</dd></>}
         <dt className="font-bold text-base">Final total</dt><dd className="font-bold text-base">{money(preview)}</dd>
         <dt className="text-muted">Card hold</dt><dd className="text-muted">{money(o.authorizedCents)}</dd>
@@ -100,7 +121,7 @@ function OrderReceipt({ o, s, photos, emailOn }: { o: BatchOrder; s: Suggest; ph
       <div className="flex flex-wrap gap-2">
         <button className="btn btn-primary" disabled={pending} onClick={() => start(async () => {
           setError("");
-          try { setSaved(await saveReceipts(o.id, { kroger: k, meijer: m })); } catch (e) { setError((e as Error).message); }
+          try { setSaved(await saveReceipts(o.id, { kroger: k, meijer: m, serviceFee: fee, secondStoreFee: fee2 })); } catch (e) { setError((e as Error).message); }
         })}>{saved ? "Update total" : "Save total & charge"}</button>
         {saved && !delivered && (
           <button className="btn btn-ghost" disabled={pending} onClick={() => start(async () => {
