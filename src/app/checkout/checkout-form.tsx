@@ -111,7 +111,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses,
 
       <p className="bg-card border border-line rounded-2xl p-4 text-sm">
         Substitution choices are set per item in your <Link href="/cart" className="underline font-bold">cart</Link>.
-        {" "}{cart.items.filter((i) => (i.subChoice ?? "codys_pick") === "codys_pick").length} of {cart.items.length} items are set to &ldquo;Let me pick.&rdquo;
+        {" "}{cart.items.filter((i) => (i.subChoice ?? "codys_pick") === "codys_pick").length} of {cart.items.length} items are set to &ldquo;Let Cody pick.&rdquo;
       </p>
 
       {hasKroger && (
