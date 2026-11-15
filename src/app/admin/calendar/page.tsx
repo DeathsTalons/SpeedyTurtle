@@ -20,7 +20,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/admin/c
   ]);
   const weeklyMap: Record<number, boolean> = Object.fromEntries((weekly ?? []).map((w: any) => [w.weekday, w.is_open]));
   const ov: Override[] = (overrides ?? []).map((o: any) => ({ date: o.date, slotTemplateId: o.slot_template_id, isOpen: o.is_open, note: o.note }));
-  const slots = (templates ?? []).map((t: any) => ({ id: t.id, label: t.label, start: t.start_time, end: t.end_time, capacity: t.capacity }));
+  const slots = (templates ?? []).map((t: any) => ({ id: t.id, label: t.label, start: t.start_time, end: t.end_time, capacity: t.capacity, area: t.area ?? null }));
 
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = addDays(from, i);

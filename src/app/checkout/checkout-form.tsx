@@ -11,11 +11,11 @@ import type { FeeTier } from "@/lib/pricing";
 import { formatDate, formatTime } from "@/lib/format";
 import { placeOrder } from "./actions";
 
-export type SlotOption = { date: string; slotTemplateId: number; label: string; window: string; remaining: number };
+export type SlotOption = { date: string; slotTemplateId: number; label: string; window: string; remaining: number; area: string | null };
 type Address = { id: string; line1: string; line2: string | null; city: string; zip: string; is_default: boolean };
 
-export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
-  paymentsOn: boolean; asapUntil: string | null; asapAddressIds: string[]; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
+export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addressAreas, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
+  paymentsOn: boolean; asapUntil: string | null; asapAddressIds: string[]; addressAreas: Record<string, string>; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
   savedKrogerPhone: string | null;
 }) {
   const cart = useCart();
@@ -33,9 +33,11 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses,
 
   const byDate = useMemo(() => {
     const m = new Map<string, SlotOption[]>();
-    for (const s of slots) m.set(s.date, [...(m.get(s.date) ?? []), s]);
+    // Only windows this address can book (mornings are Greencastle-only).
+    const area = addressAreas[addressId];
+    for (const s of slots) if (!s.area || !area || s.area === area) m.set(s.date, [...(m.get(s.date) ?? []), s]);
     return [...m];
-  }, [slots]);
+  }, [slots, addressAreas, addressId]);
 
   if (!cart.ready) return <p className="text-muted">Loading…</p>;
   if (cart.items.length === 0)
@@ -103,7 +105,10 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addresses,
         <legend className="text-xl font-extrabold mb-2">Deliver to</legend>
         {addresses.map((a) => (
           <label key={a.id} className={`flex gap-3 items-start cursor-pointer rounded-2xl border-2 p-3 ${addressId === a.id ? "border-shell bg-card" : "border-line"}`}>
-            <input type="radio" name="address" checked={addressId === a.id} onChange={() => { setAddressId(a.id); if (slotKey === "asap" && !asapAddressIds.includes(a.id)) setSlotKey(""); }} className="mt-1.5 accent-[var(--shell)]" />
+            <input type="radio" name="address" checked={addressId === a.id} onChange={() => {
+              setAddressId(a.id);
+              if (slotKey === "asap" ? !asapAddressIds.includes(a.id) : slots.some((s) => `${s.date}#${s.slotTemplateId}` === slotKey && s.area && s.area !== addressAreas[a.id])) setSlotKey("");
+            }} className="mt-1.5 accent-[var(--shell)]" />
             <span><b>{a.line1}{a.line2 ? `, ${a.line2}` : ""}</b><br /><span className="text-muted">{a.city}, IN {a.zip}</span></span>
           </label>
         ))}

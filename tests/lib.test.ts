@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { countUniqueItems, quoteOrder, finalCaptureCents, type FeeTier } from "../src/lib/pricing.ts";
-import { availableSlots, calendarView, zonedToInstant, type ScheduleInput } from "../src/lib/schedule.ts";
+import { availableSlots, calendarView, slotServes, zonedToInstant, type ScheduleInput } from "../src/lib/schedule.ts";
 import { KrogerClient } from "../src/lib/kroger.ts";
 
 const tiers: FeeTier[] = [
@@ -395,4 +395,11 @@ test("Delivery areas: Greencastle store is Greencastle, everything else is Avon 
   assert.equal(storeArea(undefined), "hendricks");
   assert.equal(asArea("greencastle"), "greencastle");
   assert.equal(asArea("Plainfield"), null);
+});
+
+test("area-only windows: mornings for Greencastle, evenings for everyone", () => {
+  assert.ok(slotServes({ area: "greencastle" }, "greencastle"));
+  assert.ok(!slotServes({ area: "greencastle" }, "hendricks"));
+  assert.ok(slotServes({ area: null }, "hendricks"));
+  assert.ok(slotServes({}, "greencastle"));
 });

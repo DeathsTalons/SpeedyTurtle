@@ -127,6 +127,7 @@ export async function getScheduleInput(now = new Date()): Promise<ScheduleInput>
     weekly: Object.fromEntries(weekly.data.map((w: any) => [w.weekday, w.is_open])),
     templates: templates.data.map((t: any): SlotTemplate => ({
       id: t.id, label: t.label, startTime: t.start_time, endTime: t.end_time, capacity: t.capacity, active: t.active,
+      area: t.area === "greencastle" || t.area === "hendricks" ? t.area : null,
     })),
     overrides: overrides.data.map((o: any): Override => ({
       date: o.date, slotTemplateId: o.slot_template_id, isOpen: o.is_open, note: o.note,

@@ -17,22 +17,24 @@ export default async function CheckoutPage() {
     ctx.db.from("profiles").select("*").eq("id", ctx.user.id).maybeSingle(), // "*": works before migration 0017 too
   ]);
   // Same-day ASAP only for addresses in the area Cody is out in right now.
+  // Each address's area: decides same-day ASAP and which windows it can book (mornings are Greencastle-only).
   const asapAddressIds: string[] = [];
-  if (availability.open) {
-    for (const ad of ctx.addresses) {
-      const home = ad.latitude != null ? { latitude: ad.latitude, longitude: ad.longitude } : null;
-      if (asapOpenFor(availability, await areaForHome(home))) asapAddressIds.push(ad.id);
-    }
+  const addressAreas: Record<string, string> = {};
+  for (const ad of ctx.addresses) {
+    const home = ad.latitude != null ? { latitude: ad.latitude, longitude: ad.longitude } : null;
+    const area = await areaForHome(home);
+    addressAreas[ad.id] = area;
+    if (availability.open && asapOpenFor(availability, area)) asapAddressIds.push(ad.id);
   }
   const byId = new Map(input.templates.map((t) => [t.id, t]));
   const options: SlotOption[] = slots.map((s) => {
     const t = byId.get(s.slotTemplateId)!;
-    return { date: s.date, slotTemplateId: s.slotTemplateId, label: s.label, window: `${clockLabel(t.startTime)}–${clockLabel(t.endTime)}`, remaining: s.remaining };
+    return { date: s.date, slotTemplateId: s.slotTemplateId, label: s.label, window: `${clockLabel(t.startTime)}–${clockLabel(t.endTime)}`, remaining: s.remaining, area: s.area };
   });
   return (
     <>
       <h1 className="text-3xl font-extrabold mb-6">Checkout</h1>
-      <CheckoutForm savedKrogerPhone={normalizeKrogerPhone(me?.kroger_card_phone)} paymentsOn={paymentsEnabled()} asapUntil={availability.open ? availability.until : null} asapAddressIds={asapAddressIds} addresses={ctx.addresses} slots={options} tiers={tiers} bufferPct={settings.authBufferPct} meijerExtraBufferPct={settings.meijerExtraBufferPct} secondStoreFeeCents={settings.secondStoreFeeCents} />
+      <CheckoutForm savedKrogerPhone={normalizeKrogerPhone(me?.kroger_card_phone)} paymentsOn={paymentsEnabled()} asapUntil={availability.open ? availability.until : null} asapAddressIds={asapAddressIds} addressAreas={addressAreas} addresses={ctx.addresses} slots={options} tiers={tiers} bufferPct={settings.authBufferPct} meijerExtraBufferPct={settings.meijerExtraBufferPct} secondStoreFeeCents={settings.secondStoreFeeCents} />
     </>
   );
 }

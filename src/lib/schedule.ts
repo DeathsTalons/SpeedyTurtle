@@ -14,6 +14,8 @@ export type SlotTemplate = {
   endTime: string;
   capacity: number;
   active?: boolean;
+  /** Only customers in this area can book it. null/undefined = every area. */
+  area?: "hendricks" | "greencastle" | null;
 };
 
 export type Override = {
@@ -41,7 +43,11 @@ export type AvailableSlot = {
   startsAt: Date;
   endsAt: Date;
   remaining: number;
+  area: "hendricks" | "greencastle" | null;
 };
+
+/** Can a customer in `area` book this window? */
+export const slotServes = (slot: { area?: string | null }, area: string) => !slot.area || slot.area === area;
 
 /** "YYYY-MM-DD" for an instant, as seen on a clock in Indiana. */
 export function localDate(d: Date, tz = TIMEZONE): string {
@@ -104,7 +110,7 @@ export function availableSlots(input: ScheduleInput): AvailableSlot[] {
       if (remaining <= 0) continue;
       out.push({
         date, weekday: weekdayOf(date), slotTemplateId: t.id, label: t.label,
-        startsAt, endsAt: zonedToInstant(date, t.endTime), remaining,
+        startsAt, endsAt: zonedToInstant(date, t.endTime), remaining, area: t.area ?? null,
       });
     }
   }
@@ -129,6 +135,7 @@ export function calendarView(
         return {
           slotTemplateId: t.id,
           label: t.label,
+          area: t.area ?? null,
           open: isSlotOpen(date, t.id, input),
           source: exact ? "slot override" : dayOverride ? "day override" : "default week",
         };

@@ -14,6 +14,7 @@ import { normalizeKrogerPhone } from "@/lib/kroger-card";
 import { authorizeOrder, createCardSetup, verifyPaymentMethod } from "@/lib/payments";
 import { after } from "next/server";
 import { alertForOrder } from "@/lib/push";
+import { slotServes } from "@/lib/schedule";
 import { MAX_APPROVED_SUBS, SUB_CHOICES, type ApprovedSub, type SubChoice } from "@/lib/shopping";
 
 export type CheckoutItem = {
@@ -127,6 +128,8 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
     const slots = await getAvailableSlots();
     const found = slots.find((s) => s.date === input.date && s.slotTemplateId === Number(input.slotTemplateId));
     if (!found) return { error: "That delivery window just filled up or closed. Pick another one." };
+    const here = await areaForHome(address.latitude != null ? { latitude: address.latitude, longitude: address.longitude } : null);
+    if (!slotServes(found, here)) return { error: "That delivery window isn't available for this address. Pick another one." };
     slot = found;
   }
 

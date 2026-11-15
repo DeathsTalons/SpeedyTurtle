@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { formatDate, clockLabel } from "@/lib/format";
 import { moveOrder, resetDay, setDayOpen, setSlotOpen, setWeekdayDefault } from "../actions";
 
-type Slot = { id: number; label: string; start: string; end: string; capacity: number };
+type Slot = { id: number; label: string; start: string; end: string; capacity: number; area: string | null };
 type Cell = { slotId: number; open: boolean; source: string; orders: { id: string; customer: string; status: string }[] };
 type Day = { date: string; weekday: number; note: string | null; dayOverride: boolean | null; cells: Cell[] };
 
@@ -68,7 +68,7 @@ export function Calendar({ days, slots, weekly, today }: { days: Day[]; slots: S
                   <button className="text-sm underline text-muted" disabled={pending} onClick={() => run(() => resetDay(d.date))}>Reset to default</button>
                 ) : null}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {d.cells.map((c) => {
                   const slot = slots.find((s) => s.id === c.slotId)!;
                   const full = c.orders.length >= slot.capacity;
@@ -86,6 +86,7 @@ export function Calendar({ days, slots, weekly, today }: { days: Day[]; slots: S
                           </button>
                         )}
                       </div>
+                      {slot.area && <p className="text-xs font-bold text-[var(--cardinal)]">{slot.area === "greencastle" ? "Greencastle only" : "Avon & Brownsburg only"}</p>}
                       <p className={`text-xs ${full ? "text-danger font-bold" : "text-muted"}`}>{c.orders.length}/{slot.capacity} booked</p>
                       <ul className="mt-1 space-y-1">
                         {c.orders.map((o) => (
