@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { countUniqueItems, quoteOrder, finalCaptureCents, type FeeTier } from "../src/lib/pricing.ts";
-import { availableSlots, calendarView, slotServes, zonedToInstant, type ScheduleInput } from "../src/lib/schedule.ts";
+import { availableSlots, calendarView, slotFits, slotServes, zonedToInstant, type ScheduleInput } from "../src/lib/schedule.ts";
 import { KrogerClient } from "../src/lib/kroger.ts";
 
 const tiers: FeeTier[] = [
@@ -402,4 +402,14 @@ test("area-only windows: mornings for Greencastle, evenings for everyone", () =>
   assert.ok(!slotServes({ area: "greencastle" }, "hendricks"));
   assert.ok(slotServes({ area: null }, "hendricks"));
   assert.ok(slotServes({}, "greencastle"));
+});
+
+test("Greencastle mornings are Kroger-only (no Meijer in Greencastle)", () => {
+  const areaChains = { greencastle: ["kroger"], hendricks: ["kroger", "meijer"] };
+  const morning = { area: "greencastle" }, evening = { area: null };
+  assert.ok(slotFits(morning, "greencastle", ["kroger"], areaChains));
+  assert.ok(!slotFits(morning, "greencastle", ["kroger", "meijer"], areaChains));
+  assert.ok(!slotFits(morning, "greencastle", ["meijer"], areaChains));
+  assert.ok(!slotFits(morning, "hendricks", ["kroger"], areaChains));
+  assert.ok(slotFits(evening, "greencastle", ["kroger", "meijer"], areaChains));
 });

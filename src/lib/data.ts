@@ -62,6 +62,13 @@ export async function getStores(): Promise<(Store & { externalLocationId: string
   }));
 }
 
+/** Which chains have a store in each area, e.g. { greencastle: ["kroger"], hendricks: ["kroger", "meijer"] }. */
+export async function chainsByArea(): Promise<Record<string, string[]>> {
+  const out: Record<string, string[]> = {};
+  for (const s of await getStores()) if (!(out[s.area] ??= []).includes(s.chain)) out[s.area].push(s.chain);
+  return out;
+}
+
 export async function storesFor(home: LatLng | null) {
   const stores = await getStores();
   return {

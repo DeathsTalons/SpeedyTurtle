@@ -4,7 +4,7 @@
 // so a customer can't edit their way to a cheaper order or an overbooked slot.
 import { customerContext } from "@/lib/customer";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { areaForHome, asapOpenFor, getAvailability, getAvailableSlots, getFeeTiers, getSettings, orderStores } from "@/lib/data";
+import { areaForHome, asapOpenFor, chainsByArea, getAvailability, getAvailableSlots, getFeeTiers, getSettings, orderStores } from "@/lib/data";
 import { kroger } from "@/lib/kroger-server";
 import { meijer } from "@/lib/meijer-server";
 import { quoteOrder, type CartLine } from "@/lib/pricing";
@@ -14,7 +14,7 @@ import { normalizeKrogerPhone } from "@/lib/kroger-card";
 import { authorizeOrder, createCardSetup, verifyPaymentMethod } from "@/lib/payments";
 import { after } from "next/server";
 import { alertForOrder } from "@/lib/push";
-import { slotServes } from "@/lib/schedule";
+import { slotFits, slotServes } from "@/lib/schedule";
 import { MAX_APPROVED_SUBS, SUB_CHOICES, type ApprovedSub, type SubChoice } from "@/lib/shopping";
 
 export type CheckoutItem = {
@@ -117,7 +117,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   }
 
   // ── Delivery window still open? (or ASAP, while Cody is available) ──
-  let slot: { date: string; slotTemplateId: number | null };
+  let slot: { date: string; slotTemplateId: number | null; area?: string | null };
   if (input.asap) {
     const a = await getAvailability();
     if (!a.open) return { error: "I just stopped taking same-day orders. Pick a delivery window instead." };
@@ -148,6 +148,11 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
   const hasMeijer = items.some((i) => i.chain === "meijer");
   if (hasKroger && !stores.kroger?.externalLocationId) return { error: "No Kroger store is set up yet." };
   if (hasMeijer && !stores.meijer) return { error: "No Meijer store is set up yet." };
+  if (slot.area) {
+    const here = await areaForHome(home);
+    if (!slotFits(slot, here, [...chainsInCart], await chainsByArea()))
+      return { error: "That morning window is for Kroger-only orders. Pick an afternoon or evening window, or remove the Meijer items." };
+  }
   if (hasKroger && hasMeijer) {
     const startStore = stores[startChain]!;
     if (!startStore.allowSecondStore) {

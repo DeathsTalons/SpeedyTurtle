@@ -9,13 +9,14 @@ import { TipNote } from "@/components/tip-note";
 import { KROGER_CARD_NOTE, formatKrogerPhone, normalizeKrogerPhone } from "@/lib/kroger-card";
 import type { FeeTier } from "@/lib/pricing";
 import { formatDate, formatTime } from "@/lib/format";
+import { slotFits } from "@/lib/schedule";
 import { placeOrder } from "./actions";
 
 export type SlotOption = { date: string; slotTemplateId: number; label: string; window: string; remaining: number; area: string | null };
 type Address = { id: string; line1: string; line2: string | null; city: string; zip: string; is_default: boolean };
 
-export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addressAreas, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
-  paymentsOn: boolean; asapUntil: string | null; asapAddressIds: string[]; addressAreas: Record<string, string>; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
+export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addressAreas, areaChains, addresses, slots, tiers, bufferPct, meijerExtraBufferPct, secondStoreFeeCents, savedKrogerPhone }: {
+  paymentsOn: boolean; asapUntil: string | null; asapAddressIds: string[]; addressAreas: Record<string, string>; areaChains: Record<string, string[]>; addresses: Address[]; slots: SlotOption[]; tiers: FeeTier[]; bufferPct: number; meijerExtraBufferPct: number; secondStoreFeeCents: number;
   savedKrogerPhone: string | null;
 }) {
   const cart = useCart();
@@ -33,11 +34,12 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addressAre
 
   const byDate = useMemo(() => {
     const m = new Map<string, SlotOption[]>();
-    // Only windows this address can book (mornings are Greencastle-only).
+    // Only windows this address and cart can book (mornings: Greencastle, Kroger-only).
     const area = addressAreas[addressId];
-    for (const s of slots) if (!s.area || !area || s.area === area) m.set(s.date, [...(m.get(s.date) ?? []), s]);
+    const chains = [...new Set(cart.items.map((i) => i.chain))];
+    for (const s of slots) if (!area || slotFits(s, area, chains, areaChains)) m.set(s.date, [...(m.get(s.date) ?? []), s]);
     return [...m];
-  }, [slots, addressAreas, addressId]);
+  }, [slots, addressAreas, areaChains, addressId, cart.items]);
 
   if (!cart.ready) return <p className="text-muted">Loading…</p>;
   if (cart.items.length === 0)
@@ -107,7 +109,7 @@ export function CheckoutForm({ paymentsOn, asapUntil, asapAddressIds, addressAre
           <label key={a.id} className={`flex gap-3 items-start cursor-pointer rounded-2xl border-2 p-3 ${addressId === a.id ? "border-shell bg-card" : "border-line"}`}>
             <input type="radio" name="address" checked={addressId === a.id} onChange={() => {
               setAddressId(a.id);
-              if (slotKey === "asap" ? !asapAddressIds.includes(a.id) : slots.some((s) => `${s.date}#${s.slotTemplateId}` === slotKey && s.area && s.area !== addressAreas[a.id])) setSlotKey("");
+              if (slotKey === "asap" ? !asapAddressIds.includes(a.id) : slots.some((s) => `${s.date}#${s.slotTemplateId}` === slotKey && !slotFits(s, addressAreas[a.id], [...new Set(cart.items.map((i) => i.chain))], areaChains))) setSlotKey("");
             }} className="mt-1.5 accent-[var(--shell)]" />
             <span><b>{a.line1}{a.line2 ? `, ${a.line2}` : ""}</b><br /><span className="text-muted">{a.city}, IN {a.zip}</span></span>
           </label>

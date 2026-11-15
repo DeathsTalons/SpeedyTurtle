@@ -49,6 +49,13 @@ export type AvailableSlot = {
 /** Can a customer in `area` book this window? */
 export const slotServes = (slot: { area?: string | null }, area: string) => !slot.area || slot.area === area;
 
+/**
+ * Area-only windows are shopped from that area's stores alone, so every chain in the order
+ * must have a store there. Greencastle has Kroger but no Meijer, so its mornings are Kroger-only.
+ */
+export const slotFits = (slot: { area?: string | null }, area: string, chains: string[], areaChains: Record<string, string[]>) =>
+  slotServes(slot, area) && (!slot.area || chains.every((c) => (areaChains[slot.area!] ?? []).includes(c)));
+
 /** "YYYY-MM-DD" for an instant, as seen on a clock in Indiana. */
 export function localDate(d: Date, tz = TIMEZONE): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);

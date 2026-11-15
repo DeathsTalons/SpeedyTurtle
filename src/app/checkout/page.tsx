@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { customerContext, ensureFeesSeen } from "@/lib/customer";
-import { areaForHome, asapOpenFor, getAvailability, getAvailableSlots, getFeeTiers, getScheduleInput, getSettings } from "@/lib/data";
+import { areaForHome, asapOpenFor, chainsByArea, getAvailability, getAvailableSlots, getFeeTiers, getScheduleInput, getSettings } from "@/lib/data";
 import { clockLabel } from "@/lib/format";
 import { CheckoutForm, type SlotOption } from "./checkout-form";
 import { paymentsEnabled } from "@/lib/stripe";
@@ -12,9 +12,10 @@ export default async function CheckoutPage() {
   const ctx = await customerContext();
   if (!ctx) redirect("/login?next=/checkout");
   await ensureFeesSeen(ctx, "/checkout");
-  const [slots, input, tiers, settings, availability, { data: me }] = await Promise.all([
+  const [slots, input, tiers, settings, availability, { data: me }, areaChains] = await Promise.all([
     getAvailableSlots(), getScheduleInput(), getFeeTiers(), getSettings(), getAvailability(),
     ctx.db.from("profiles").select("*").eq("id", ctx.user.id).maybeSingle(), // "*": works before migration 0017 too
+    chainsByArea(),
   ]);
   // Same-day ASAP only for addresses in the area Cody is out in right now.
   // Each address's area: decides same-day ASAP and which windows it can book (mornings are Greencastle-only).
@@ -34,7 +35,7 @@ export default async function CheckoutPage() {
   return (
     <>
       <h1 className="text-3xl font-extrabold mb-6">Checkout</h1>
-      <CheckoutForm savedKrogerPhone={normalizeKrogerPhone(me?.kroger_card_phone)} paymentsOn={paymentsEnabled()} asapUntil={availability.open ? availability.until : null} asapAddressIds={asapAddressIds} addressAreas={addressAreas} addresses={ctx.addresses} slots={options} tiers={tiers} bufferPct={settings.authBufferPct} meijerExtraBufferPct={settings.meijerExtraBufferPct} secondStoreFeeCents={settings.secondStoreFeeCents} />
+      <CheckoutForm savedKrogerPhone={normalizeKrogerPhone(me?.kroger_card_phone)} paymentsOn={paymentsEnabled()} asapUntil={availability.open ? availability.until : null} asapAddressIds={asapAddressIds} addressAreas={addressAreas} areaChains={areaChains} addresses={ctx.addresses} slots={options} tiers={tiers} bufferPct={settings.authBufferPct} meijerExtraBufferPct={settings.meijerExtraBufferPct} secondStoreFeeCents={settings.secondStoreFeeCents} />
     </>
   );
 }
