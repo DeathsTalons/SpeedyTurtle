@@ -1,11 +1,11 @@
 // Delivery areas, for "available now" (same-day ASAP): Cody is out in one of them at a time.
-// A customer's area = the area of the Kroger store nearest their address (Kroger covers all three towns).
+// A customer's area = the area of the Kroger store nearest their address (Kroger covers every town).
 
 export type Area = "hendricks" | "greencastle";
 export const AREAS: Area[] = ["hendricks", "greencastle"];
 
 export const AREA_LABEL: Record<Area, string> = {
-  hendricks: "Avon & Brownsburg",
+  hendricks: "Avon, Brownsburg & Danville",
   greencastle: "Greencastle",
 };
 

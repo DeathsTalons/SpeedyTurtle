@@ -86,7 +86,7 @@ export function Calendar({ days, slots, weekly, today }: { days: Day[]; slots: S
                           </button>
                         )}
                       </div>
-                      {slot.area && <p className="text-xs font-bold text-[var(--cardinal)]">{slot.area === "greencastle" ? "Greencastle only" : "Avon & Brownsburg only"}</p>}
+                      {slot.area && <p className="text-xs font-bold text-[var(--cardinal)]">{slot.area === "greencastle" ? "Greencastle only" : "Avon, Brownsburg & Danville only"}</p>}
                       <p className={`text-xs ${full ? "text-danger font-bold" : "text-muted"}`}>{c.orders.length}/{slot.capacity} booked</p>
                       <ul className="mt-1 space-y-1">
                         {c.orders.map((o) => (

@@ -5,7 +5,7 @@ export const BUSINESS = {
   email: "codylspaulding@gmail.com",
   phone: "(765) 719-0163",
   phoneHref: "+17657190163",
-  area: "Brownsburg, Avon, Greencastle and nearby in Indiana",
+  area: "Brownsburg, Avon, Danville, Greencastle and nearby in Indiana",
   /** Shown at the top of Terms, Privacy and Refunds. Update when you change any of them. */
   policiesUpdated: "November 12, 2026",
 };

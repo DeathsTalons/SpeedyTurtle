@@ -6,7 +6,7 @@ import type { Availability } from "@/lib/data";
 import { AREAS, AREA_LABEL, type Area } from "@/lib/areas";
 import { setAsapCapacity, setAvailable, setAvailableArea } from "./actions";
 
-/** "Available now" for same-day ASAP orders, in ONE area at a time (Avon & Brownsburg, or Greencastle). */
+/** "Available now" for same-day ASAP orders, in ONE area at a time (Avon, Brownsburg & Danville, or Greencastle). */
 export function AvailabilityToggle({ a }: { a: Availability }) {
   const [pending, start] = useTransition();
   const router = useRouter();

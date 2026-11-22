@@ -51,9 +51,31 @@ export async function getSettings(): Promise<Settings> {
   };
 }
 
+/**
+ * A Kroger store added with just its location ID gets its address and map pin from Kroger's API
+ * the first time stores load, so nearest-store matching includes it. Best effort: never throws.
+ */
+async function locateNewKrogerStores(rows: any[]) {
+  const missing = rows.filter((s) => s.chain === "kroger" && s.external_location_id && (s.latitude == null || s.longitude == null));
+  if (!missing.length || !process.env.KROGER_CLIENT_ID) return;
+  const { KrogerClient } = await import("@/lib/kroger");
+  const kroger = KrogerClient.fromEnv();
+  for (const s of missing) {
+    try {
+      const loc = await kroger.getLocation(s.external_location_id);
+      if (loc.latitude == null || loc.longitude == null) continue;
+      await db().from("stores").update({ address: loc.address, latitude: loc.latitude, longitude: loc.longitude }).eq("id", s.id);
+      Object.assign(s, { address: loc.address, latitude: loc.latitude, longitude: loc.longitude });
+    } catch (e) {
+      console.error(`couldn't locate ${s.name}:`, (e as Error).message);
+    }
+  }
+}
+
 export async function getStores(): Promise<(Store & { externalLocationId: string | null; address: string | null; allowSecondStore: boolean; area: Area })[]> {
   const { data, error } = await db().from("stores").select("*").eq("active", true);
   if (error) throw error;
+  await locateNewKrogerStores(data);
   return data.map((s: any) => ({
     id: s.id, chain: s.chain, name: s.name, active: s.active,
     latitude: s.latitude, longitude: s.longitude,

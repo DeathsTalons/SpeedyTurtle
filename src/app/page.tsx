@@ -14,7 +14,7 @@ export default async function Home() {
         <h1 className="text-4xl sm:text-5xl font-extrabold text-shell-dark max-w-xl">I&apos;ll shop your Kroger or Meijer groceries for you.</h1>
         <p className="text-lg max-w-lg">
           Pick your store and fill your cart. I shop every order myself, text you before swapping anything,
-          and drop it at your door in Brownsburg, Avon and Greencastle.
+          and drop it at your door in Brownsburg, Avon, Danville and Greencastle.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/login" className="btn btn-primary">Create an account or sign in</Link>

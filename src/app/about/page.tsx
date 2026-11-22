@@ -4,7 +4,7 @@ import { BUSINESS } from "@/lib/business";
 
 export const metadata = {
   title: "About · Redbird Grocery",
-  description: "Redbird Grocery is one local shopper with 1,200+ grocery orders of experience, serving Brownsburg, Avon and Greencastle.",
+  description: "Redbird Grocery is one local shopper with 1,200+ grocery orders of experience, serving Brownsburg, Avon, Danville and Greencastle.",
 };
 
 const FACTS = [
@@ -60,7 +60,7 @@ export default function AboutPage() {
       <section className="space-y-3">
         <h2 className="text-2xl font-extrabold">Small and local, on purpose</h2>
         <p>
-          When you order from {BUSINESS.name}, you&apos;re supporting a neighbor, not a shareholder. I deliver in Brownsburg, Avon and
+          When you order from {BUSINESS.name}, you&apos;re supporting a neighbor, not a shareholder. I deliver in Brownsburg, Avon, Danville and
           Greencastle, and every order helps a small Indiana business grow. Thank you for that. It means a lot.
         </p>
       </section>
