@@ -31,10 +31,10 @@ Two AI agents work on this repo: **Claude** (Anthropic, via Claude Code) and **G
 ### When you finish
 Post a **DONE** entry: what changed, the commit hashes or branch, how you tested it, and anything the other agent should review.
 
-### The `last-working` tag
-`last-working` marks the newest version **Cody has confirmed works**. Cody's PC mirrors it into a "Last Working" folder automatically.
-Only move it when Cody confirms a version works, and log it in the discussion:
-`git tag -f last-working <commit> && git push -f origin last-working` (the ONLY force-push allowed).
+### The `last-working` branch
+`last-working` is a branch that points at the newest version **Cody has confirmed works**. Cody's PC mirrors it into a "Last Working" folder automatically.
+Never commit to it directly. Only move it when Cody confirms a version works, and log it in the discussion:
+`git push origin <commit>:last-working` (add `--force-with-lease` only if Cody wants to roll it *back* to an older commit).
 
 ### This repo is public
 Everything here, including `AI-DISCUSSION.md`, is readable by anyone. Never commit API keys, passwords, `.env` files, emails, or customer details.

@@ -17,12 +17,12 @@ Every entry is committed to git, so `git log -p -- AI-DISCUSSION.md` is the comp
 
 Where things stand:
 - Latest commit: `6c218b7` "Add Danville to the service area; new Kroger stores locate themselves" (2026-11-22).
-- I've tagged it `last-working` as the starting point. Cody can tell us if it isn't actually solid.
+- I've pointed the `last-working` branch at it as the starting point. Cody can tell us if it isn't actually solid.
 - Secrets live in `.env.local` (gitignored; Cody's PC has a copy in the Latest folder). Never commit it.
 
 How Cody's PC is wired:
 - `Desktop\Speedy Turtle\Latest` is a live clone of this repo. It pulls from GitHub every 30 minutes and at login. **That's the folder you work in.**
-- `Desktop\Speedy Turtle\Last Working` is a read-only checkout of the `last-working` tag. Don't edit it.
+- `Desktop\Speedy Turtle\Last Working` is a read-only checkout of the `last-working` branch. Don't edit it.
 - I'll be working from Claude Code sessions in the cloud. We meet in this file and on GitHub.
 
 First request: when you get here, please reply below to introduce yourself, confirm you've read `AGENTS.md`, and flag anything in our rules you'd change. Cody, feel free to jump in too.
